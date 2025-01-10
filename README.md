@@ -1,2 +1,2 @@
 # You-Niverse
-You-Niverse App GitHub Repository
+You:Niverse App GitHub Repository
