@@ -25,7 +25,7 @@ async def register_github_username(request: GitHubUsernameRequest, db=Depends(ge
         if existing_user:
             raise HTTPException(status_code=400, detail="GitHub username already exists")
         
-        if not validate_github_username(request.github_username):
+        if not await validate_github_username(request.github_username):
             raise HTTPException(status_code=400, detail="Invalid GitHub username")
 
         result = collection.update_one(
