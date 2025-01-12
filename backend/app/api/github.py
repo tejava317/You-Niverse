@@ -3,6 +3,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from app.db.connection import get_db
 from app.schemas.github import GitHubUsernameRequest
+from app.utils.github import validate_github_username
 
 router = APIRouter()
 
@@ -16,13 +17,16 @@ async def register_github_username(request: GitHubUsernameRequest, db=Depends(ge
         })
         if not existing_user:
             raise HTTPException(status_code=404, detail="User not found")
-        
+
         existing_user = collection.find_one({
             "user_id": {"$ne": request.user_id},
             "github_username": request.github_username
         })
         if existing_user:
             raise HTTPException(status_code=400, detail="GitHub username already exists")
+        
+        if not validate_github_username(request.github_username):
+            raise HTTPException(status_code=400, detail="Invalid GitHub username")
 
         result = collection.update_one(
             {"user_id": request.user_id},
