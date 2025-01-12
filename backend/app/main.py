@@ -1,7 +1,7 @@
 # /backend/app/main.py
 # Define main application of Fast API
 from fastapi import FastAPI, Depends
-from app.api import auth, project
+from app.api import auth
 from app.db.connection import get_db
 
 # Initialize FastAPI application
