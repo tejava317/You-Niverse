@@ -1,3 +1,5 @@
+# /backend/app/schemas/auth.py
+# Define schemas for authentication API requests and responses
 from pydantic import BaseModel
 
 class UserSignUpRequest(BaseModel):
