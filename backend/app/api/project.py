@@ -12,23 +12,23 @@ from app.utils.project import get_sequential_planet_index, compute_project_d_day
 
 router = APIRouter()
 
-@router.post("/create-project", response_model=CreateProjectResponse)
-async def create_project(request: CreateProjectRequest, db=Depends(get_db)):
+@router.post("/create-project/{user_id}", response_model=CreateProjectResponse)
+async def create_project(user_id: str, request: CreateProjectRequest, db=Depends(get_db)):
     try:
         collection = db["project_info"]
 
         existing_project = collection.find_one({
-            "user_id": request.user_id,
+            "user_id": user_id,
             "project_name": request.project_name
         })
         if existing_project:
             raise HTTPException(status_code=400, detail=f"Project '{request.project_name}' already exists")
 
         project_id = generate_project_id()
-        planet_index = get_sequential_planet_index(collection, request.user_id)
+        planet_index = get_sequential_planet_index(collection, user_id)
         
         result = collection.insert_one({
-            "user_id": request.user_id,
+            "user_id": user_id,
             "project_id": project_id,
             "project_name": request.project_name,
             "project_start": request.project_start,

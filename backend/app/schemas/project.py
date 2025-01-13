@@ -4,7 +4,6 @@ from pydantic import BaseModel, Field, field_validator, model_validator
 from datetime import datetime
 
 class CreateProjectRequest(BaseModel):
-    user_id: str
     project_name: str
     project_start: str = Field(..., description="Start date in YYYY-MM-DD format")
     project_end: str = Field(..., description="End date in YYYY-MM-DD format")
