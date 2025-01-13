@@ -74,7 +74,7 @@ async def register_github_repo(user_id: str, project_id: str, request: GitHubRep
         
         result = project_collection.update_one(
             {"user_id": user_id, "project_id": project_id},
-            {"$set": {"github_repo": request.github_repo}}
+            {"$set": {"owner_username": request.owner_username, "github_repo": request.github_repo}}
         )
         if result.modified_count == 1:
             return {"message": "GitHub repository successfully registered"}

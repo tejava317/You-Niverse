@@ -37,6 +37,7 @@ async def create_project(user_id: str, request: CreateProjectRequest, db=Depends
             "project_name": request.project_name,
             "project_start": request.project_start,
             "project_end": request.project_end,
+            "owner_username": None,
             "github_repo": None,
             "planet_index": planet_index
         })
