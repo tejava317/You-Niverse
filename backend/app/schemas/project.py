@@ -38,6 +38,12 @@ class GetProjectInfoResponse(BaseModel):
     todo: str | None
     idea: str | None
 
+class GetScrumResponse(BaseModel):
+    message: str
+    done: str | None
+    todo: str | None
+    idea: str | None
+
 class UpdateScrumRequest(BaseModel):
     scrum_date: str = Field(..., description="Scrum date in YYYY-MM-DD format")
     scrum_update: str

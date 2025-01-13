@@ -7,6 +7,7 @@ from app.schemas.project import (
     CreateProjectRequest,
     CreateProjectResponse,
     GetProjectInfoResponse,
+    GetScrumResponse,
     UpdateScrumRequest,
     UpdateScrumResponse
 )
@@ -112,6 +113,37 @@ async def get_project_info(user_id: str, project_id: str, db=Depends(get_db)):
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to get project info: {str(e)}")
+
+@router.get("/get-scrum/{user_id}/{project_id}/{scrum_date}", response_model=GetScrumResponse)
+async def get_scrum(user_id: str, project_id: str, scrum_date: str, db=Depends(get_db)):
+    try:
+        try:
+            datetime.strptime(scrum_date, "%Y-%m-%d")
+        except ValueError:
+            raise HTTPException(status_code=400, detail=f"Date '{scrum_date}' is not in the correct format (YYYY-MM-DD)")
+        
+        collection = db["scrum"]
+
+        scrum_data = collection.find_one({
+            "user_id": user_id,
+            "project_id": project_id,
+            "scrum_date": scrum_date
+        })
+        if not scrum_data:
+            scrum_data = {
+                "done": None,
+                "todo": None,
+                "idea": None
+            }
+        
+        return {
+            "message": "Scrum data successfully retrieved",
+            "done": scrum_data.get("done"),
+            "todo": scrum_data.get("todo"),
+            "idea": scrum_data.get("idea")
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get scrum data: {str(e)}")
 
 @router.post("/update-scrum/{user_id}/{project_id}/{field}", response_model=UpdateScrumResponse)
 async def update_scrum(user_id: str, project_id: str, field: str, request: UpdateScrumRequest, db=Depends(get_db)):
