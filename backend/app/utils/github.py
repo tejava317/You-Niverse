@@ -1,3 +1,5 @@
+# /backend/app/utils/github.py
+# Validate GitHub username
 from fastapi import HTTPException
 from app.core.config import settings
 import httpx
