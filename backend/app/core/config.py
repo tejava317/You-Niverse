@@ -8,6 +8,9 @@ class Settings(BaseSettings):
 
     GITHUB_API_TOKEN: str
 
+    GOOGLE_CLIENT_ID: str
+    GOOGLE_CLIENT_SECRET: str
+
     class Config:
         env_file = ".env"
 
