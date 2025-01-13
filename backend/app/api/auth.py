@@ -13,25 +13,26 @@ router = APIRouter()
 
 # Sign-up for general user
 @router.post("/user-sign-up")
-async def user_sign_up(user_info: UserSignUpRequest, db=Depends(get_db)):
+async def user_sign_up(request: UserSignUpRequest, db=Depends(get_db)):
     try:
         collection = db["user_info"]
 
         existing_user = collection.find_one({
             "login_type": "general",
-            "username": user_info.username
+            "username": request.username
         })
         if existing_user:
             raise HTTPException(status_code=400, detail="Username already exists")
         
         user_id = generate_user_id()
-        # hashed_password = hash_password(user_info.password)
+        # hashed_password = hash_password(request.password)
         user_data = {
             "user_id": user_id,
             "login_type": "general",
-            "username": user_info.username,
-            "password": user_info.password,
+            "username": request.username,
+            "password": request.password,
             "google_id": None,
+            "nickname": request.nickname,
             "github_username": None
         }
         result = collection.insert_one(user_data)
@@ -42,18 +43,18 @@ async def user_sign_up(user_info: UserSignUpRequest, db=Depends(get_db)):
 
 # Login for general user
 @router.post("/user-login")
-async def user_login(user_info: UserLoginRequest, db=Depends(get_db)):
+async def user_login(request: UserLoginRequest, db=Depends(get_db)):
     try:
         collection = db["user_info"]
 
         user = collection.find_one({
             "login_type": "general",
-            "username": user_info.username
+            "username": request.username
         })
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
         
-        if user_info.password == user["password"]:
+        if request.password == user["password"]:
             return {"message": "User successfully logged in"}
         else:
             raise HTTPException(status_code=401, detail="Invalid password")
@@ -63,10 +64,10 @@ async def user_login(user_info: UserLoginRequest, db=Depends(get_db)):
 
 # Login for Google user
 @router.post("/google-login")
-async def google_login(user_info: GoogleLoginRequest, db=Depends(get_db)):
+async def google_login(request: GoogleLoginRequest, db=Depends(get_db)):
     try:
         collection = db["user_info"]
-        query = {"login_type": "google", "google_id": user_info.google_id}
+        query = {"login_type": "google", "google_id": request.google_id}
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to verify Google user information: {str(e)}")

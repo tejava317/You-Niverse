@@ -5,6 +5,7 @@ from pydantic import BaseModel
 class UserSignUpRequest(BaseModel):
     username: str
     password: str
+    nickname: str
 
 class UserLoginRequest(BaseModel):
     username: str
@@ -12,3 +13,4 @@ class UserLoginRequest(BaseModel):
 
 class GoogleLoginRequest(BaseModel):
     google_id: str
+    nickname: str
