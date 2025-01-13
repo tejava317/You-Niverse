@@ -7,7 +7,7 @@ from app.schemas.project import (
     CreateProjectResponse
 )
 from app.utils.crypt import generate_project_id
-from app.utils.project import get_sequential_planet_index
+from app.utils.project import get_sequential_planet_index, compute_project_d_day
 
 router = APIRouter()
 
@@ -68,3 +68,24 @@ async def delete_project(user_id: str, project_name: str, db=Depends(get_db)):
             raise HTTPException(status_code=500, detail="Failed to delete project")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to delete project: {str(e)}")
+
+@router.get("/get-project-info/{user_id}/{project_name}")
+async def get_project_info(user_id: str, project_name: str, db=Depends(get_db)):
+    try:
+        collection = db["project_info"]
+
+        project = collection.find_one({
+            "user_id": user_id,
+            "project_name": project_name,
+        })
+        if not project:
+            raise HTTPException(status_code=404, detail=f"Project '{project_name}' not found")
+        
+        d_day = compute_project_d_day(project["project_end"])
+        return {
+            "project_id": project["project_id"],
+            "d_day": d_day
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get project info: {str(e)}")

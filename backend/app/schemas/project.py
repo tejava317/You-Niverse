@@ -22,3 +22,7 @@ class CreateProjectResponse(BaseModel):
     project_id: str
     project_name: str
     planet_index: int
+
+class GetProjectInfoResponse(BaseModel):
+    project_id: str
+    d_day: int

@@ -1,5 +1,6 @@
 # /backend/app/utils/project.py
 # Utlity functions for project API
+from datetime import date, datetime
 
 def get_sequential_planet_index(collection, user_id) -> int:
     pipeline = [
@@ -22,3 +23,11 @@ def get_sequential_planet_index(collection, user_id) -> int:
             return i
 
     return len(existing_indices)
+
+def compute_project_d_day(project_end: date) -> int:
+    today = datetime.now().date()
+
+    if isinstance(project_end, datetime):
+        project_end = project_end.date()
+
+    return (project_end - today).days
