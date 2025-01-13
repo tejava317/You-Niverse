@@ -75,8 +75,8 @@ async def delete_project(user_id: str, project_id: str, db=Depends(get_db)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to delete project: {str(e)}")
 
-@router.get("/get-project-info/{user_id}/{project_id}", response_model=GetProjectInfoResponse)
-async def get_project_info(user_id: str, project_id: str, db=Depends(get_db)):
+@router.get("/load-project-info/{user_id}/{project_id}", response_model=GetProjectInfoResponse)
+async def load_project_info(user_id: str, project_id: str, db=Depends(get_db)):
     try:
         project_collection = db["project_info"]
 
@@ -114,8 +114,8 @@ async def get_project_info(user_id: str, project_id: str, db=Depends(get_db)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to get project info: {str(e)}")
 
-@router.get("/get-scrum/{user_id}/{project_id}/{scrum_date}", response_model=GetScrumResponse)
-async def get_scrum(user_id: str, project_id: str, scrum_date: str, db=Depends(get_db)):
+@router.get("/load-scrum/{user_id}/{project_id}/{scrum_date}", response_model=GetScrumResponse)
+async def load_scrum(user_id: str, project_id: str, scrum_date: str, db=Depends(get_db)):
     try:
         try:
             datetime.strptime(scrum_date, "%Y-%m-%d")
