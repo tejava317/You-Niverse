@@ -45,3 +45,26 @@ async def create_project(request: CreateProjectRequest, db=Depends(get_db)):
     except Exception as e:
         # Rollback database
         raise HTTPException(status_code=500, detail=f"Failed to create project: {str(e)}")
+
+@router.delete("/delete-project/{user_id}/{project_name}")
+async def delete_project(user_id: str, project_name: str, db=Depends(get_db)):
+    try:
+        collection = db["project_info"]
+
+        existing_project = collection.find_one({
+            "user_id": user_id,
+            "project_name": project_name
+        })
+        if not existing_project:
+            raise HTTPException(status_code=404, detail=f"Project '{project_name}' not found")
+
+        result = collection.delete_one({
+            "user_id": user_id,
+            "project_name": project_name
+        })
+        if result.deleted_count == 1:
+            return {"message": f"Project '{project_name}' successfully deleted"}
+        else:
+            raise HTTPException(status_code=500, detail="Failed to delete project")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to delete project: {str(e)}")
