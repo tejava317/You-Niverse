@@ -8,3 +8,11 @@ class GitHubUsernameRequest(BaseModel):
 class GitHubRepoRequest(BaseModel):
     owner_username: str
     github_repo: str
+
+class LoadStreakResponse(BaseModel):
+    message: str
+    streak: int
+
+class LoadCommitsTodayResponse(BaseModel):
+    message: str
+    commits_today: int

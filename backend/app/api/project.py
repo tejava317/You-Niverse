@@ -37,6 +37,7 @@ async def create_project(user_id: str, request: CreateProjectRequest, db=Depends
             "project_name": request.project_name,
             "project_start": request.project_start,
             "project_end": request.project_end,
+            "owner_username": None,
             "github_repo": None,
             "planet_index": planet_index
         })
@@ -113,7 +114,7 @@ async def load_project_info(user_id: str, project_id: str, db=Depends(get_db)):
             "idea": today_scrum.get("idea")
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to get project info: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to load project information: {str(e)}")
 
 @router.get("/load-scrum/{user_id}/{project_id}/{scrum_date}", response_model=GetScrumResponse)
 async def load_scrum(user_id: str, project_id: str, scrum_date: str, db=Depends(get_db)):
@@ -144,7 +145,7 @@ async def load_scrum(user_id: str, project_id: str, scrum_date: str, db=Depends(
             "idea": scrum_data.get("idea")
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to get scrum data: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to load scrum data: {str(e)}")
 
 @router.post("/update-scrum/{user_id}/{project_id}/{field}", response_model=UpdateScrumResponse)
 async def update_scrum(user_id: str, project_id: str, field: str, request: UpdateScrumRequest, db=Depends(get_db)):
