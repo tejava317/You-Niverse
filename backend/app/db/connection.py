@@ -7,10 +7,9 @@ from app.core.config import settings
 MONGODB_URI = settings.MONGODB_URI
 DATABASE_NAME = settings.DATABASE_NAME
 
-client = MongoClient(MONGODB_URI, server_api=ServerApi('1'))
-db = client[DATABASE_NAME]
-
 def get_db():
+    client = MongoClient(MONGODB_URI, server_api=ServerApi('1'))
+    db = client[DATABASE_NAME]
     try:
         yield db
     finally:

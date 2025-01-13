@@ -1,0 +1,66 @@
+# /backend/app/utils/github.py
+# Validate GitHub username
+from fastapi import HTTPException
+from app.core.config import settings
+import httpx
+
+GITHUB_API_TOKEN = settings.GITHUB_API_TOKEN
+
+headers = {
+    "Authorization": f"Bearer {GITHUB_API_TOKEN}",
+    "Accept": "application/vnd.github.v3+json"
+}
+
+async def validate_github_username(username: str):
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.get(
+                f"https://api.github.com/users/{username}",
+                headers=headers
+            )
+            if response.status_code == 200:
+                return True
+            elif response.status_code == 404:
+                return False
+            elif response.status_code == 403:
+                raise HTTPException(
+                    status_code=503,
+                    detail="GitHub API rate limit exceeded. Please try again later."
+                )
+            else:
+                raise HTTPException(
+                    status_code=503,
+                    detail="Failed to verify GitHub username"
+                )
+        except httpx.RequestError as e:
+            raise HTTPException(
+                status_code=503,
+                detail="Failed to connect to GitHub API"
+            )
+
+async def validate_github_repo(owner: str, repo_name: str):
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.get(
+                f"https://api.github.com/repos/{owner}/{repo_name}",
+                headers=headers
+            )
+            if response.status_code == 200:
+                return True
+            elif response.status_code == 404:
+                return False
+            elif response.status_code == 403:
+                raise HTTPException(
+                    status_code=503,
+                    detail="GitHub API rate limit exceeded. Please try again later."
+                )
+            else:
+                raise HTTPException(
+                    status_code=503,
+                    detail="Failed to verify GitHub repository"
+                )
+        except httpx.RequestError:
+            raise HTTPException(
+                status_code=503,
+                detail="Failed to connect to GitHub API"
+            )
