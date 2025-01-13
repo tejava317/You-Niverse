@@ -24,10 +24,12 @@ def get_sequential_planet_index(collection, user_id) -> int:
 
     return len(existing_indices)
 
-def compute_project_d_day(project_end: date) -> int:
+def compute_project_d_day(project_end: str) -> int:
+    try:
+        project_end_date = datetime.strptime(project_end, "%Y-%m-%d").date()
+    except ValueError:
+        raise ValueError(f"Invalid date format for project_end: {project_end} (Expected YYYY-MM-DD)")
+
     today = datetime.now().date()
-
-    if isinstance(project_end, datetime):
-        project_end = project_end.date()
-
-    return (project_end - today).days
+    
+    return (project_end_date - today).days

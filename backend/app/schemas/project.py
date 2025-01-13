@@ -1,21 +1,29 @@
 # /backend/app/schema/project.py
 # Define schemas for project API requests and responses
-from pydantic import BaseModel
-from datetime import date, datetime
+from pydantic import BaseModel, Field, field_validator, model_validator
+from datetime import datetime
 
 class CreateProjectRequest(BaseModel):
     user_id: str
     project_name: str
-    project_start: date
-    project_end: date
+    project_start: str = Field(..., description="Start date in YYYY-MM-DD format")
+    project_end: str = Field(..., description="End date in YYYY-MM-DD format")
 
-    def to_mongo_dict(self):
-        return {
-            "user_id": self.user_id,
-            "project_name": self.project_name,
-            "project_start": datetime.combine(self.project_start, datetime.min.time()),  # date → datetime 변환
-            "project_end": datetime.combine(self.project_end, datetime.min.time())      # date → datetime 변환
-        }
+    @field_validator("project_start", "project_end")
+    def validate_date_format(cls, value):
+        try:
+            datetime.strptime(value, "%Y-%m-%d")
+            return value
+        except ValueError:
+            raise ValueError(f"Date '{value}' is not in the correct format (YYYY-MM-DD)")
+
+    @model_validator(mode="after")
+    def validate_date_order(cls, values):
+        start = datetime.strptime(values.project_start, "%Y-%m-%d")
+        end = datetime.strptime(values.project_end, "%Y-%m-%d")
+        if start > end:
+            raise ValueError("Start date must be earlier than or equal to end date")
+        return values
 
 class CreateProjectResponse(BaseModel):
     message: str
@@ -24,5 +32,6 @@ class CreateProjectResponse(BaseModel):
     planet_index: int
 
 class GetProjectInfoResponse(BaseModel):
-    project_id: str
+    message: str
+    project_name: str
     d_day: int
