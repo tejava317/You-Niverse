@@ -34,3 +34,19 @@ class GetProjectInfoResponse(BaseModel):
     message: str
     project_name: str
     d_day: int
+
+class UpdateScrumRequest(BaseModel):
+    scrum_date: str = Field(..., description="Scrum date in YYYY-MM-DD format")
+    scrum_update: str
+
+    @field_validator("scrum_date")
+    def validate_date_format(cls, value):
+        try:
+            datetime.strptime(value, "%Y-%m-%d")
+            return value
+        except ValueError:
+            raise ValueError(f"Date '{value}' is not in the correct format (YYYY-MM-DD)")
+
+class UpdateScrumResponse(BaseModel):
+    message: str
+    scrum_update: str
