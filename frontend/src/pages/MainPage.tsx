@@ -1,14 +1,32 @@
-import * as React from 'react';
-import { Box, IconButton, Image, Text } from '@chakra-ui/react';
-import { ArrowBackIcon, ArrowForwardIcon } from '@chakra-ui/icons';
-import { useNavigate } from 'react-router-dom';
+import * as React from "react";
+import { Box, Text, Image } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
+import ChangePlanet from "../components/ChangePlanet";
+import { IconButton } from "@chakra-ui/react";
+import { FaUser } from "react-icons/fa";
+import { useState } from "react";
+import UserInfoModal from "../components/UserInfoModal";
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
+  const [currentPlanet, setCurrentPlanet] = React.useState({
+    name: "Mercury",
+    video: "/images/mercury.mp4",
+  });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handlePlanetChange = (planet: { name: string; video: string }) => {
+    setCurrentPlanet(planet);
+  };
 
   const handleNavigation = () => {
-    navigate('/PlanetPage'); // Adjust this path based on your route configuration
+    navigate("/AddPlanetPage");
   };
+
+
+
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
 
   return (
     <Box
@@ -21,82 +39,60 @@ const Home: React.FC = () => {
       alignItems="center"
       justifyContent="center"
     >
-      <Box
-        position="relative"
-        w="1200px"
-        h="800px"
-        minW="1200px"
-        minH="800px"
-      >
-        {/* Circular Line */}
+      <Box position="relative" w="1200px" h="800px" minW="1200px" minH="800px">
+        {/* Change Planet Component */}
+        <ChangePlanet onPlanetChange={handlePlanetChange} />
+
+        {/* Circular Line with Video */}
         <Box
           position="absolute"
-          top="55%" // Adjust to move it higher or lower
+          top="55%"
           left="50%"
           transform="translate(-50%, -50%)"
-          w="350px" // Circle width
-          h="350px" // Circle height
-          border="0.05px solid rgba(255, 255, 255, 0.2)" // Circular border
-          borderRadius="50%" // Make it circular
-          overflow="hidden" // Ensures the video stays within the circle
-          zIndex={4} // Ensure it appears above other elements
+          w="350px"
+          h="350px"
+          border="0.05px solid rgba(255, 255, 255, 0.2)"
+          borderRadius="50%"
+          overflow="hidden"
+          zIndex={4}
         >
-          <video
-            src="/images/example.mp4"
-            autoPlay
-            loop
-            muted
-            style={{
-              width: '50%',
-              height: '50%',
-              objectFit: 'cover', // Ensures the video fills the circle
-              position: 'absolute',
-              top: '25%',
-              left: '25%',
-            }}
-          />
+          <Box
+            position="absolute"
+            top="50%"
+            left="50%"
+            transform="translate(-50%, -50%)"
+            w="250px"
+            h="250px"
+          >
+            <video
+              src={currentPlanet.video}
+              autoPlay
+              loop
+              muted
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+              }}
+              onDoubleClick={() => navigate("/PlanetProjectPage")} // Navigate on double-click
+            />
+          </Box>
         </Box>
 
-         {/* Circular Button with Left Arrow */}
-         <IconButton
-          icon={<ArrowBackIcon />} // Left arrow icon
-          aria-label="Go back"
+        {/* Black Box under planet name */}
+        <Box
           position="absolute"
-          bottom="42%" // Adjust position
-          left="34%" // Adjust position
-          w="40px" // Circle size
-          h="40px" // Circle size
-          borderRadius="50%" // Makes it circular
+          top="81%"
+          left="50%"
+          transform="translate(-50%, -50%)"
+          w="150px"
+          h="100px"
           bg="black"
-          border="0.05px solid rgba(255, 255, 255, 0.2)"
-          color="white"
-          zIndex={9999} // Highest zIndex
-          _hover={{
-            bg: 'gray.600',
-          }}
-          onClick={handleNavigation}
+          borderTop="0.05px solid rgba(255, 255, 255, 0.2)"
+          zIndex={4}
         />
 
-        <IconButton
-          icon={<ArrowForwardIcon />} // Right arrow icon
-          aria-label="Go back"
-          position="absolute"
-          bottom="42%" // Adjust position
-          left="63%" // Adjust position
-          w="40px" // Circle size
-          h="40px" // Circle size
-          borderRadius="50%" // Makes it circular
-          bg="black"
-          border="0.05px solid rgba(255, 255, 255, 0.2)"
-          color="white"
-          zIndex={9999} // Highest zIndex
-          _hover={{
-            bg: 'gray.600',
-          }}
-          onClick={handleNavigation}
-        />
-
-        {/* Text above the black box */}
+        {/* Header Text */}
         <Box
           position="absolute"
           top="20%"
@@ -106,11 +102,7 @@ const Home: React.FC = () => {
           textAlign="center"
           w="80%"
         >
-          <Text 
-          fontSize="5xl"
-           fontWeight="bold" 
-           color="white"
-           letterSpacing="-1px" >
+          <Text fontSize="5xl" fontWeight="bold" color="white" letterSpacing="-1px">
             To Space and Back
           </Text>
           <Text fontSize="lg" color="gray.400">
@@ -118,52 +110,67 @@ const Home: React.FC = () => {
           </Text>
         </Box>
 
-        {/* Navigation Button */}
-       {/* Black box that stays centered */}
+        {/* Navigation Button Container */}
         <Box
-        top="50%"
-        left="50%"
-        transform="translate(-50%, -50%)"
-        w="1350px"
-        h="700px"
-        bgColor="black"
-        zIndex={2}
-        position="relative" // Set position relative for proper alignment of the child button
+          top="50%"
+          left="50%"
+          transform="translate(-50%, -50%)"
+          w="1350px"
+          h="700px"
+          bgColor="black"
+          zIndex={2}
+          position="relative"
         >
-        {/* Navigation Button */}
-        <Box
-            as="button"
-            position="absolute"
-            bottom="0" // Align the button with the bottom edge of the black box
-            right="0" // Align the button with the right edge of the black box
-            zIndex={3}
-            bg="#FF0000"
-            border="2px"
-            borderColor="#FF0000"
-            w="200px"
-            h="50px"
-            px="6"
-            py="3"
-            display="flex"
-            alignItems="center"
-            pl="20px"
-            color="white"
-            transition="all 0.3s"
-            borderRadius="0"
-            _hover={{
-            opacity: 0.9,
-            }}
-            onClick={handleNavigation}
-        >
-            <Text fontSize="sm">Next Page</Text>
+          {/* User Icon */}
+          <Box position="absolute" top="5px" left="5px" zIndex={5}>
+            <IconButton
+              icon={<FaUser />}
+              aria-label="User Info"
+              bg="transparent"
+              color="white"
+              size="lg"
+              _hover={{
+                color: "gray.400",
+                borderRadius: "0",
+                border: "1px solid red",
+              }}
+              onClick={openModal}
+            />
+          </Box>
+            {/* Next Page Button */}
+            <Box
+              as="button"
+              position="absolute"
+              bottom="0"
+              right="0"
+              zIndex={3}
+              bg="#FF0000"
+              //border="1px solid white"
+              borderColor="#FF0000"
+              w="200px"
+              h="50px"
+              px="6"
+              py="3"
+              display="flex"
+              alignItems="center"
+              pl="20px"
+              color="white"
+              transition="all 0.3s"
+              borderRadius="0"
+              _hover={{
+                opacity: 0.9,
+              }}
+              onClick={handleNavigation}
+            >
+              <Text fontSize="sm">Add a Planet</Text>
+            </Box>
+
+
         </Box>
-        </Box>
 
-
-
-        {/* Moon image */}
+        {/* Moon background image */}
         <Image
-          src={'/images/moon.png'}
+          src={"/images/moon.png"}
           alt="Moon Image"
           position="absolute"
           right="-10%"
@@ -172,6 +179,9 @@ const Home: React.FC = () => {
           objectFit="contain"
           zIndex={1}
         />
+
+        {/* User Info Modal */}
+        <UserInfoModal isOpen={isModalOpen} onClose={closeModal} />
       </Box>
     </Box>
   );

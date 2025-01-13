@@ -2,6 +2,10 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { extendTheme,ChakraProvider } from '@chakra-ui/react';
 import Home from './pages/MainPage';
 import '@fontsource/krona-one';
+import Login from './pages/LoginPage';
+import CreateAccount from './pages/CreateAccountPage';
+import PlanetProject from './pages/PlanetProjectPage';
+import AddPlanet from './pages/AddPlanetPage';
 
 
 const theme = extendTheme({
@@ -32,7 +36,13 @@ function App() {
     <ChakraProvider theme={theme}>
       <Router>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login/>} />
+          <Route path="/MainPage" element={<Home />} />
+          <Route path="/CreateAccountPage" element={<CreateAccount />} />
+          <Route path="/LoginPage" element={<Login />} />
+          <Route path="/PlanetProjectPage" element={< PlanetProject/>} />
+          <Route path="/AddPlanetPage" element={<AddPlanet />} />
+          <Route path="/" element={<Login />} />
         </Routes>
       </Router>
     </ChakraProvider>
