@@ -5,6 +5,7 @@ from app.db.connection import get_db
 from app.schemas.auth import (
     UserSignUpRequest,
     UserLoginRequest,
+    UserLoginResponse,
     GoogleLoginRequest
 )
 from app.utils.crypt import generate_user_id, hash_password
@@ -42,7 +43,7 @@ async def user_sign_up(request: UserSignUpRequest, db=Depends(get_db)):
         raise HTTPException(status_code=500, detail=f"Failed to register user information: {str(e)}")
 
 # Login for general user
-@router.post("/user-login")
+@router.post("/user-login", response_model=UserLoginResponse)
 async def user_login(request: UserLoginRequest, db=Depends(get_db)):
     try:
         collection = db["user_info"]
@@ -55,7 +56,10 @@ async def user_login(request: UserLoginRequest, db=Depends(get_db)):
             raise HTTPException(status_code=404, detail="User not found")
         
         if request.password == user["password"]:
-            return {"message": "User successfully logged in"}
+            return {
+                "message": "User successfully logged in",
+                "user_id": user["user_id"]
+            }
         else:
             raise HTTPException(status_code=401, detail="Invalid password")
     except Exception as e:

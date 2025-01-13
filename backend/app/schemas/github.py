@@ -3,5 +3,4 @@
 from pydantic import BaseModel
 
 class GitHubUsernameRequest(BaseModel):
-    user_id: str
     github_username: str

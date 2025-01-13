@@ -11,6 +11,10 @@ class UserLoginRequest(BaseModel):
     username: str
     password: str
 
+class UserLoginResponse(BaseModel):
+    message: str
+    user_id: str
+
 class GoogleLoginRequest(BaseModel):
     google_id: str
     nickname: str

@@ -7,19 +7,19 @@ from app.utils.github import validate_github_username
 
 router = APIRouter()
 
-@router.post("/register-github-username")
-async def register_github_username(request: GitHubUsernameRequest, db=Depends(get_db)):
+@router.post("/register-github-username/{user_id}")
+async def register_github_username(user_id: str, request: GitHubUsernameRequest, db=Depends(get_db)):
     try:
         collection = db["user_info"]
 
         existing_user = collection.find_one({
-            "user_id": request.user_id
+            "user_id": user_id
         })
         if not existing_user:
             raise HTTPException(status_code=404, detail="User not found")
 
         existing_user = collection.find_one({
-            "user_id": {"$ne": request.user_id},
+            "user_id": {"$ne": user_id},
             "github_username": request.github_username
         })
         if existing_user:
@@ -29,7 +29,7 @@ async def register_github_username(request: GitHubUsernameRequest, db=Depends(ge
             raise HTTPException(status_code=400, detail="Invalid GitHub username")
 
         result = collection.update_one(
-            {"user_id": request.user_id},
+            {"user_id": user_id},
             {"$set": {"github_username": request.github_username}}
         )
 
