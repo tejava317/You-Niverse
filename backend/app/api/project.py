@@ -1,6 +1,7 @@
 # /backend/app/api/project.py
 # Project API
 from fastapi import APIRouter, HTTPException, Depends
+from datetime import datetime
 from app.db.connection import get_db
 from app.schemas.project import (
     CreateProjectRequest,
@@ -76,9 +77,9 @@ async def delete_project(user_id: str, project_id: str, db=Depends(get_db)):
 @router.get("/get-project-info/{user_id}/{project_id}", response_model=GetProjectInfoResponse)
 async def get_project_info(user_id: str, project_id: str, db=Depends(get_db)):
     try:
-        collection = db["project_info"]
+        project_collection = db["project_info"]
 
-        project = collection.find_one({
+        project = project_collection.find_one({
             "user_id": user_id,
             "project_id": project_id,
         })
@@ -87,10 +88,27 @@ async def get_project_info(user_id: str, project_id: str, db=Depends(get_db)):
         
         d_day = compute_project_d_day(project["project_end"])
 
+        scrum_collection = db["scrum"]
+        today_date = datetime.now().strftime("%Y-%m-%d")
+        today_scrum = scrum_collection.find_one({
+            "user_id": user_id,
+            "project_id": project_id,
+            "scrum_date": today_date
+        })
+        if not today_scrum:
+            today_scrum = {
+                "done": None,
+                "todo": None,
+                "idea": None
+            }
+        
         return {
             "message": "Project information successfully retrieved",
             "project_name": project["project_name"],
-            "d_day": d_day
+            "d_day": d_day,
+            "done": today_scrum.get("done"),
+            "todo": today_scrum.get("todo"),
+            "idea": today_scrum.get("idea")
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to get project info: {str(e)}")
