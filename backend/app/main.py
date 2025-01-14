@@ -1,6 +1,7 @@
 # /backend/app/main.py
 # Define main application of Fast API
 from fastapi import FastAPI, Depends
+from fastapi.middleware.cors import CORSMiddleware
 from app.api import auth, github, project
 from app.db.connection import get_db
 
@@ -9,6 +10,20 @@ app = FastAPI(
     title="You:Niverse App Backend API",
     description="Backend API for You:Niverse App",
     version="1.0.0"
+)
+
+# CORS 설정
+origins = [
+    "http://localhost:5176",  # React 개발 서버
+    "https://your-production-domain.com"  # 프로덕션 도메인
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,  # 허용할 Origin 리스트
+    allow_credentials=True,  # 쿠키 허용
+    allow_methods=["*"],  # 모든 HTTP 메서드 허용
+    allow_headers=["*"],  # 모든 HTTP 헤더 허용
 )
 
 # Register router (Process requests using each handler function)
