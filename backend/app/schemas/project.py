@@ -7,7 +7,9 @@ class CreateProjectRequest(BaseModel):
     project_name: str
     project_start: str = Field(..., description="Start date in YYYY-MM-DD format")
     project_end: str = Field(..., description="End date in YYYY-MM-DD format")
-
+    owner_username: str
+    github_repo: str
+    
     @field_validator("project_start", "project_end")
     def validate_date_format(cls, value):
         try:
