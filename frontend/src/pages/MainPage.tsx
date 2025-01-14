@@ -1,3 +1,4 @@
+//MainPage.tsx
 import * as React from "react";
 import { Box, Text, Image } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
@@ -9,19 +10,7 @@ import UserInfoModal from "../components/UserInfoModal";
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
-  const [currentPlanet, setCurrentPlanet] = React.useState({
-    name: "Mercury",
-    video: "/images/mercury.mp4",
-  });
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handlePlanetChange = (planet: { name: string; video: string }) => {
-    setCurrentPlanet(planet);
-  };
-
-  const handleNavigation = () => {
-    navigate("/AddPlanetPage");
-  };
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -48,61 +37,12 @@ const Home: React.FC = () => {
         zIndex={2}
       >
         {/* Change Planet Component */}
-        <ChangePlanet onPlanetChange={handlePlanetChange} />
-
-        {/* Circular Line with Video */}
-        <Box
-          position="absolute"
-          top="55%"
-          left="50%"
-          transform="translate(-50%, -50%)"
-          w="350px"
-          h="350px"
-          border="0.05px solid rgba(255, 255, 255, 0.2)"
-          borderRadius="50%"
-          overflow="hidden"
-          zIndex={4}
-        >
-          <Box
-            position="absolute"
-            top="50%"
-            left="50%"
-            transform="translate(-50%, -50%)"
-            w="250px"
-            h="250px"
-          >
-            <video
-              src={currentPlanet.video}
-              autoPlay
-              loop
-              muted
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-              }}
-              onDoubleClick={() => navigate("/PlanetProjectPage")}
-            />
-          </Box>
-        </Box>
-
-        {/* Black Box under planet name */}
-        <Box
-          position="absolute"
-          top="79.5%"
-          left="50%"
-          transform="translate(-50%, -50%)"
-          w="150px"
-          h="100px"
-          bg="black"
-          borderTop="0.05px solid rgba(255, 255, 255, 0.2)"
-          zIndex={4}
-        />
+        <ChangePlanet onPlanetChange={() => {}} />
 
         {/* Header Text */}
         <Box
           position="absolute"
-          top="20%"
+          top="12%"
           left="50%"
           transform="translate(-50%, -50%)"
           zIndex={3}
@@ -156,7 +96,7 @@ const Home: React.FC = () => {
           _hover={{
             opacity: 0.9,
           }}
-          onClick={handleNavigation}
+          onClick={() => navigate("/AddPlanetPage")}
         >
           <Text fontSize="sm">Add a Planet</Text>
         </Box>
