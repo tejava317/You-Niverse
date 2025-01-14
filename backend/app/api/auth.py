@@ -59,7 +59,9 @@ async def user_login(request: UserLoginRequest, db=Depends(get_db)):
         if request.password == user["password"]:
             return UserLoginResponse(
                 message="User successfully logged in",
-                user_id=user["user_id"]
+                user_id=user["user_id"],
+                nickname=user["nickname"],
+                github_username=user["github_username"]
             )
         else:
             raise HTTPException(status_code=401, detail="Invalid password")
@@ -78,11 +80,13 @@ async def google_login(request: GoogleLoginRequest, db=Depends(get_db)):
             "google_email": request.google_email
         })
         if existing_user:
-            return {
-                "message": "User successfully logged in",
-                "user_id": existing_user["user_id"]
-            }
-
+            return GoogleLoginResponse(
+                message="User successfully logged in",
+                user_id=existing_user["user_id"],
+                nickname=existing_user["nickname"],
+                github_username=existing_user["github_username"]
+            )
+        
         user_id = generate_user_id()
         user_data = {
             "user_id": user_id,
@@ -97,7 +101,9 @@ async def google_login(request: GoogleLoginRequest, db=Depends(get_db)):
         
         return GoogleLoginResponse(
             message="User successfully logged in",
-            user_id=user_id
+            user_id=user_id,
+            nickname=request.nickname,
+            github_username=user_data["github_username"]
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to verify Google user information: {str(e)}")
