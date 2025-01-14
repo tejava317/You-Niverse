@@ -11,9 +11,9 @@ interface Planet {
 }
 
 interface Project {
-  userId: string;
+  user_id: string;
   projectName: string;
-  projectId: string;
+  project_id: string;
   createdAt: string;
 }
 
@@ -38,10 +38,10 @@ const fixedPositions = [
 
 interface ChangePlanetProps {
   onPlanetChange: (planet: { name: string; video: string }) => void;
-  userId: string;
+  user_id: string;
 }
 
-const ChangePlanet: React.FC<ChangePlanetProps> = ({ onPlanetChange, userId }) => {
+const ChangePlanet: React.FC<ChangePlanetProps> = ({ onPlanetChange, user_id }) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -52,13 +52,13 @@ const ChangePlanet: React.FC<ChangePlanetProps> = ({ onPlanetChange, userId }) =
     const fetchProjects = async () => {
       try {
         setLoading(true);
-        console.log("Current userId:", userId);
+        console.log("Current userId:", user_id);
         
         // localStorage에서 userId 가져오기 시도
         const storedUserId = localStorage.getItem('user_id');
         console.log("Stored userId:", storedUserId);
         
-        const currentUserId = userId || storedUserId;
+        const currentUserId = user_id || storedUserId;
         
         if (!currentUserId) {
           console.log("No userId found");
@@ -93,7 +93,7 @@ const ChangePlanet: React.FC<ChangePlanetProps> = ({ onPlanetChange, userId }) =
     };
 
     fetchProjects();
-  }, [userId]);
+  }, [user_id]);
 
   useEffect(() => {
     // 초기 행성 선택
@@ -106,7 +106,7 @@ const ChangePlanet: React.FC<ChangePlanetProps> = ({ onPlanetChange, userId }) =
   const handlePlanetClick = () => {
     const centralProject = projects[currentIndex];
     if (centralProject) {
-      navigate("/PlanetProjectPage", { state: { projectId: centralProject.projectId } });
+      navigate("/PlanetProjectPage", { state: { project_id: centralProject.project_id } });
     }
   };
 

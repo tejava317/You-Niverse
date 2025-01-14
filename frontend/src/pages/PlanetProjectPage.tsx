@@ -13,7 +13,7 @@ const calendarMockData = [
   date: "January 13, 2025",
   details: {
     done: "I did my frontend",
-    next: "Have to do my backend",
+    todo: "Have to do my backend",
     idea: "Happy",
   },
 },
@@ -21,7 +21,7 @@ const calendarMockData = [
   date: "January 14, 2025",
   details: {
     done: "Worked on the backend",
-    next: "Integrate frontend and backend",
+    todo: "Integrate frontend and backend",
     idea: "Productive day!",
   },
 },
@@ -34,7 +34,7 @@ const PlanetProject: React.FC = () => {
   const [, setSelectedDate] = useState<string | null>(null);
   const [selectedDetails, setSelectedDetails] = useState<{
     done: string;
-    next: string;
+    todo: string;
     idea: string;
   } | null>(null);
 
@@ -47,7 +47,7 @@ const PlanetProject: React.FC = () => {
     } else {
       setSelectedDetails({
         done: "No data available",
-        next: "No data available",
+        todo: "No data available",
         idea: "No data available",
       });
     }
