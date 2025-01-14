@@ -6,7 +6,8 @@ from app.schemas.auth import (
     UserSignUpRequest,
     UserLoginRequest,
     UserLoginResponse,
-    GoogleLoginRequest
+    GoogleLoginRequest,
+    GoogleLoginResponse
 )
 from app.utils.crypt import generate_user_id, hash_password
 
@@ -32,7 +33,7 @@ async def user_sign_up(request: UserSignUpRequest, db=Depends(get_db)):
             "login_type": "general",
             "username": request.username,
             "password": request.password,
-            "google_id": None,
+            "google_email": None,
             "nickname": request.nickname,
             "github_username": None
         }
@@ -56,10 +57,10 @@ async def user_login(request: UserLoginRequest, db=Depends(get_db)):
             raise HTTPException(status_code=404, detail="User not found")
         
         if request.password == user["password"]:
-            return {
-                "message": "User successfully logged in",
-                "user_id": user["user_id"]
-            }
+            return UserLoginResponse(
+                message="User successfully logged in",
+                user_id=user["user_id"]
+            )
         else:
             raise HTTPException(status_code=401, detail="Invalid password")
     except Exception as e:
@@ -67,11 +68,36 @@ async def user_login(request: UserLoginRequest, db=Depends(get_db)):
         raise HTTPException(status_code=500, detail=f"Failed to verify user information: {str(e)}")
 
 # Login for Google user
-@router.post("/google-login")
+@router.post("/google-login", response_model=GoogleLoginResponse)
 async def google_login(request: GoogleLoginRequest, db=Depends(get_db)):
     try:
         collection = db["user_info"]
-        query = {"login_type": "google", "google_id": request.google_id}
 
+        existing_user = collection.find_one({
+            "login_type": "google",
+            "google_email": request.google_email
+        })
+        if existing_user:
+            return {
+                "message": "User successfully logged in",
+                "user_id": existing_user["user_id"]
+            }
+
+        user_id = generate_user_id()
+        user_data = {
+            "user_id": user_id,
+            "login_type": "general",
+            "username": None,
+            "password": None,
+            "google_email": request.google_email,
+            "nickname": request.nickname,
+            "github_username": None
+        }
+        result = collection.insert_one(user_data)
+        
+        return GoogleLoginResponse(
+            message="User successfully logged in",
+            user_id=user_id
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to verify Google user information: {str(e)}")

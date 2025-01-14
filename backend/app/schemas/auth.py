@@ -16,5 +16,9 @@ class UserLoginResponse(BaseModel):
     user_id: str
 
 class GoogleLoginRequest(BaseModel):
-    google_id: str
+    google_email: str
     nickname: str
+
+class GoogleLoginResponse(BaseModel):
+    message: str
+    user_id: str
