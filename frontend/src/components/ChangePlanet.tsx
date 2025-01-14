@@ -1,9 +1,7 @@
-// ChangePlanet.tsx
 import React, { useState } from "react";
 import { IconButton, Box, Image, Text } from "@chakra-ui/react";
 import { ArrowBackIcon, ArrowForwardIcon } from "@chakra-ui/icons";
 
-// Data for the planets
 const planetData = [
   { name: "Mercury", video: "/images/mercury.mp4", image: "/images/mercury.png" },
   { name: "Venus", video: "/images/venus.mp4", image: "/images/venus.png" },
@@ -16,10 +14,10 @@ const planetData = [
 ];
 
 const fixedPositions = [
-  { top: "48%", left: "5%" }, // Leftmost
-  { top: "48%", left: "20%" }, // Left
-  { top: "48%", left: "80%" }, // Right
-  { top: "48%", left: "95%" }, // Rightmost
+  { top: "48%", left: "7%" },
+  { top: "48%", left: "22%" },
+  { top: "48%", left: "78%" },
+  { top: "48%", left: "93%" },
 ];
 
 interface ChangePlanetProps {
@@ -41,16 +39,15 @@ const ChangePlanet: React.FC<ChangePlanetProps> = ({ onPlanetChange }) => {
     onPlanetChange(planetData[newIndex]);
   };
 
-  // Helper to get circular array indices for left/right images
   const getCircularIndex = (offset: number) =>
     (currentIndex + offset + planetData.length) % planetData.length;
 
   const centralPlanet = planetData[currentIndex];
   const sideImages = [
-    planetData[getCircularIndex(-2)], // Leftmost
-    planetData[getCircularIndex(-1)], // Left
-    planetData[getCircularIndex(1)], // Right
-    planetData[getCircularIndex(2)], // Rightmost
+    planetData[getCircularIndex(-2)],
+    planetData[getCircularIndex(-1)],
+    planetData[getCircularIndex(1)],
+    planetData[getCircularIndex(2)],
   ];
 
   return (
@@ -90,47 +87,47 @@ const ChangePlanet: React.FC<ChangePlanetProps> = ({ onPlanetChange }) => {
         _hover={{ bg: "gray.600" }}
       />
 
-{sideImages.map((planet, index) => (
-  <Box
-    key={index}
-    position="absolute"
-    top={planet.name === "Saturn" ? "38%" : fixedPositions[index].top}
-    left={fixedPositions[index].left}
-    transform="translate(-50%, 0)"
-    w={planet.name === "Saturn" ? "300px" : "130px"}
-    h="auto"
-    zIndex={5}
-  >
-    <Box
-      w="100%"
-      h={planet.name === "Saturn" ? "280px" : "130px"}
-      borderRadius="50%"
-      overflow="hidden"
-      bg="transparent"
-    >
-      <Image
-        src={planet.image}
-        alt={planet.name}
-        objectFit={planet.name === "Saturn" ? "contain" : "cover"}
-        p={planet.name === "Saturn" ? "30px" : "0"}
-        w="100%"
-        h="100%"
-      />
-    </Box>
-    <Text
-      color="white"
-      fontSize="sm"
-      textAlign="center"
-      mt={planet.name === "Saturn" ? "80px" : "8px"}
-      position="relative"
-      top={planet.name === "Saturn" ? "-142px" : "0"}
-      fontFamily="Krona One"
-      letterSpacing="1px"
-    >
-      {planet.name}
-    </Text>
-  </Box>
-))}
+      {sideImages.map((planet, index) => (
+        <Box
+          key={index}
+          position="absolute"
+          top={planet.name === "Saturn" ? "38%" : fixedPositions[index].top}
+          left={fixedPositions[index].left}
+          transform="translate(-50%, 0)"
+          w={planet.name === "Saturn" ? "30vh" : "13vh"}
+          h="auto"
+          zIndex={5}
+        >
+          <Box
+            w="100%"
+            h={planet.name === "Saturn" ? "28vh" : "13vh"}
+            borderRadius="50%"
+            overflow="hidden"
+            bg="transparent"
+          >
+            <Image
+              src={planet.image}
+              alt={planet.name}
+              objectFit={planet.name === "Saturn" ? "contain" : "cover"}
+              p={planet.name === "Saturn" ? "30px" : "0"}
+              w="100%"
+              h="100%"
+            />
+          </Box>
+          <Text
+            color="white"
+            fontSize="sm"
+            textAlign="center"
+            mt={planet.name === "Saturn" ? "8vh" : "8px"}
+            position="relative"
+            top={planet.name === "Saturn" ? "-14vh" : "0"}
+            fontFamily="Krona One"
+            letterSpacing="1px"
+          >
+            {planet.name}
+          </Text>
+        </Box>
+      ))}
 
       {/* Central Planet Name */}
       <Text

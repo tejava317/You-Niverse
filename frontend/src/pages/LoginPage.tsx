@@ -1,17 +1,92 @@
 import * as React from 'react';
-import { Box, Button, Image, Input, InputGroup, InputLeftElement, Text } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Image,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  Text,
+  useToast,
+} from '@chakra-ui/react';
 import { FaUser, FaLock } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import GoogleLoginComponent from '../components/GoogleLogin';
+import { GoogleUser } from '../types/GoogleUser';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
+  const toast = useToast();
 
-  const handleNavigation = () => {
-    navigate('/MainPage'); // Navigate to the Main Page
+  // State to store username and password
+  const [formData, setFormData] = React.useState({
+    username: '',
+    password: '',
+  });
+
+  // Handle input changes
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Handle login submission
+  const handleSignIn = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/user-login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        toast({
+          title: 'Login Successful!',
+          description: `Welcome back, ${data.nickname}!`,
+          status: 'success',
+          duration: 5000,
+          isClosable: true,
+        });
+        navigate('/MainPage'); // Navigate to the Main Page on success
+      } else {
+        const errorData = await response.json();
+        toast({
+          title: 'Login Failed',
+          description: errorData.message || 'Invalid username or password.',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
+      toast({
+        title: 'Network Error',
+        description: 'Unable to connect to the server.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
+
+  // Handle navigation to Create Account Page
   const handleCreateAccount = () => {
-    navigate('/CreateAccountPage'); // Navigate to the Create Account Page
+    navigate('/CreateAccountPage');
+  };
+
+  // Handle Google login success
+  const handleGoogleLoginSuccess = (user: GoogleUser) => {
+    console.log('Google login successful:', user);
+    navigate('/MainPage');
+  };
+
+  // Handle Google login failure
+  const handleGoogleLoginFailure = (error: string) => {
+    console.error('Google login failed:', error);
   };
 
   return (
@@ -23,38 +98,29 @@ const Login: React.FC = () => {
       position="relative"
       display="flex"
       alignItems="center"
-      justifyContent="flex-start" // Align the content to the left
-      pl="10%" // Add padding to push the container slightly from the left
+      justifyContent="flex-start"
+      pl="10%"
     >
       {/* Main Container */}
-      <Box
-        position="relative"
-        w="400px"
-        p={8}
-        bg="black"
-        borderRadius="md"
-        zIndex={3}
-        textAlign="center"
-      >
+      <Box position="relative" w="400px" p={8} bg="black" borderRadius="md" zIndex={3} textAlign="center">
         {/* Login Header */}
         <Text fontSize="2xl" fontWeight="bold" color="white" mb={8}>
           Login to Your Space
         </Text>
 
-        {/* User Input */}
+        {/* Username Input */}
         <InputGroup mb={4}>
           <InputLeftElement pointerEvents="none" color="gray.400">
             <FaUser />
           </InputLeftElement>
           <Input
+            name="username"
             placeholder="USER"
             bg="gray.700"
             color="white"
-            _placeholder={{ color: 'gray.400',
-                fontSize:"sm",
-                fontWeight:"normal",
-
-             }}
+            value={formData.username}
+            onChange={handleChange}
+            _placeholder={{ color: 'gray.400', fontSize: 'sm', fontWeight: 'normal' }}
             border="none"
             borderRadius="full"
           />
@@ -66,14 +132,14 @@ const Login: React.FC = () => {
             <FaLock />
           </InputLeftElement>
           <Input
+            name="password"
             placeholder="PASSWORD"
             type="password"
             bg="gray.700"
             color="white"
-            _placeholder={{ color: 'gray.400',
-                fontSize:"sm",
-                fontWeight:"normal",
-             }}
+            value={formData.password}
+            onChange={handleChange}
+            _placeholder={{ color: 'gray.400', fontSize: 'sm', fontWeight: 'normal' }}
             border="none"
             borderRadius="full"
           />
@@ -87,7 +153,7 @@ const Login: React.FC = () => {
           borderRadius="full"
           mb={4}
           _hover={{ bg: 'red.500' }}
-          onClick={handleNavigation}
+          onClick={handleSignIn}
         >
           Sign In
         </Button>
@@ -98,20 +164,10 @@ const Login: React.FC = () => {
         </Text>
 
         {/* Google Sign In Button */}
-        <Button
-          w="100%"
-          bg="#F2F2F2"
-          color="black"
-          borderRadius="full"
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          mb={4}
-          _hover={{ bg: 'gray.200' }}
-        >
-          <Image src="/images/google.png" alt="Google Icon" boxSize="40px"  />
-          Sign in with Google
-        </Button>
+        <GoogleLoginComponent
+          onLoginSuccess={handleGoogleLoginSuccess}
+          onLoginFailure={handleGoogleLoginFailure}
+        />
 
         {/* Create an Account Button */}
         <Text fontSize="sm" color="gray.400" mb={2}>

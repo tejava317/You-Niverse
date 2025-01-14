@@ -8,14 +8,17 @@ import {
   Flex,
   Button,
   IconButton,
+  useToast,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css"; // react-datepicker 기본 스타일
+import "react-datepicker/dist/react-datepicker.css";
 import { ArrowBackIcon, CalendarIcon } from "@chakra-ui/icons";
 
 const AddPlanet: React.FC = () => {
   const navigate = useNavigate();
+  const toast = useToast();
+  const userId = "your_user_id_here"; // Replace with the actual user ID from context or props
   const [currentPlanet] = React.useState({
     name: "Mercury",
     video: "/images/mercury.mp4",
@@ -36,13 +39,11 @@ const AddPlanet: React.FC = () => {
     };
 
     console.log("Saved Project:", savedProject);
-
-    // Add logic to save `savedProject` to your database or state
     alert("Project saved!");
   };
 
   const handleBackToMain = () => {
-    navigate("/MainPage"); // Adjust the path as needed for your main page
+    navigate("/MainPage");
   };
 
   // Custom Input for react-datepicker
@@ -87,12 +88,21 @@ const AddPlanet: React.FC = () => {
       alignItems="center"
       justifyContent="center"
     >
-      <Box position="relative" w="1200px" h="800px" minW="1200px" minH="800px">
+      {/* Central Content Box with black background */}
+      <Box
+        position="relative"
+        w="90vw"
+        h="90vh"
+        minW="1350px"
+        minH="800px"
+        bgColor="black"
+        zIndex={2}
+      >
         {/* Circular Line with Video */}
         <Box
           position="absolute"
           top="55%"
-          left="20%"
+          left="25%"
           transform="translate(-50%, -50%)"
           w="350px"
           h="350px"
@@ -127,8 +137,8 @@ const AddPlanet: React.FC = () => {
         {/* Black Box under planet name */}
         <Box
           position="absolute"
-          top="81%"
-          left="20%"
+          top="79.5%"
+          left="25%"
           transform="translate(-50%, -50%)"
           w="150px"
           h="100px"
@@ -137,39 +147,28 @@ const AddPlanet: React.FC = () => {
           borderTop="0.05px solid rgba(255, 255, 255, 0.2)"
         />
 
-        {/* Central Black Box */}
-        <Box
+        {/* Back Button */}
+        <IconButton
+          icon={<ArrowBackIcon />}
+          aria-label="Back to Main Page"
           position="absolute"
-          top="50%"
-          left="50%"
-          transform="translate(-50%, -50%)"
-          w="1350px"
-          h="700px"
-          bg="black"
-          zIndex={3}
-        >
-          {/* Back Button */}
-          <IconButton
-            icon={<ArrowBackIcon />}
-            aria-label="Back to Main Page"
-            position="absolute"
-            top="10px"
-            left="10px"
-            size="lg"
-            bg="transparent"
-            color="white"
-            _hover={{
-              color: "gray.400",
-            }}
-            onClick={handleBackToMain}
-          />
-        </Box>
+          top="10px"
+          left="10px"
+          size="lg"
+          bg="transparent"
+          color="white"
+          zIndex={5}
+          _hover={{
+            color: "gray.400",
+          }}
+          onClick={handleBackToMain}
+        />
 
         {/* Right-Side Form */}
         <Box
           position="absolute"
           top="20%"
-          right="15%"
+          right="20%"
           w="400px"
           bg="black"
           p={6}
@@ -314,19 +313,19 @@ const AddPlanet: React.FC = () => {
             Add Project
           </Button>
         </Box>
-
-        {/* Moon background image */}
-        <Image
-          src={"/images/moon.png"}
-          alt="Moon Image"
-          position="absolute"
-          right="-10%"
-          top="50%"
-          transform="translateY(-50%)"
-          objectFit="contain"
-          zIndex={1}
-        />
       </Box>
+
+      {/* Moon background image */}
+      <Image
+        src="/images/moon.png"
+        alt="Moon Image"
+        position="absolute"
+        right="-10%"
+        top="50%"
+        transform="translateY(-50%)"
+        objectFit="contain"
+        zIndex={1}
+      />
     </Box>
   );
 };

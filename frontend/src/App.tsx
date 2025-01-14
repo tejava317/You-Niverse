@@ -1,3 +1,4 @@
+//App.tsx
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { extendTheme,ChakraProvider } from '@chakra-ui/react';
 import Home from './pages/MainPage';
@@ -6,6 +7,15 @@ import Login from './pages/LoginPage';
 import CreateAccount from './pages/CreateAccountPage';
 import PlanetProject from './pages/PlanetProjectPage';
 import AddPlanet from './pages/AddPlanetPage';
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import ErrorBoundary from './components/ErrorBoundary';
+
+const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+console.log("Client ID is:", clientId); // Check if this prints in console
+
+if (!clientId) {
+  console.error("No client ID found!");
+}
 
 
 const theme = extendTheme({
@@ -31,8 +41,11 @@ const theme = extendTheme({
 });
 
 
+
 function App() {
   return (
+    <ErrorBoundary>
+    <GoogleOAuthProvider clientId={clientId}>
     <ChakraProvider theme={theme}>
       <Router>
         <Routes>
@@ -46,7 +59,10 @@ function App() {
         </Routes>
       </Router>
     </ChakraProvider>
+    </GoogleOAuthProvider>
+    </ErrorBoundary>
   );
 }
+console.log("Google Client ID:", clientId);
 
 export default App;
