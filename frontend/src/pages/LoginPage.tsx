@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -8,21 +8,24 @@ import {
   InputLeftElement,
   Text,
   useToast,
-} from '@chakra-ui/react';
-import { FaUser, FaLock } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
-import GoogleLoginComponent from '../components/GoogleLogin';
-import { GoogleUser } from '../types/GoogleUser';
+} from "@chakra-ui/react";
+import { FaUser, FaLock } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import GoogleLoginComponent from "../components/GoogleLogin";
+import GitHubUsernameModal from "../components/GithubModal";
+import { GoogleUser } from "../types/GoogleUser";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const toast = useToast();
 
-  // State to store username and password
-  const [formData, setFormData] = React.useState({
-    username: '',
-    password: '',
-  });
+  const [formData, setFormData] = useState({ username: "", password: "" });
+  const [githubModalOpen, setGithubModalOpen] = useState(false);
+  const [userDetails, setUserDetails] = useState<{
+    nickname: string;
+    user_id?: string;
+    loginMethod: "google" | "regular";
+  } | null>(null);
 
   // Handle input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -30,63 +33,199 @@ const Login: React.FC = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle login submission
+  // Handle regular login submission
   const handleSignIn = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/user-login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/auth/user-login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
 
       if (response.ok) {
         const data = await response.json();
-        toast({
-          title: 'Login Successful!',
-          description: `Welcome back, ${data.nickname}!`,
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
+
+        localStorage.setItem("nickname", data.nickname);
+        localStorage.setItem("user_id", data.user_id);
+
+        if (data.github_username) {
+          // Save GitHub username if it exists in the database
+          localStorage.setItem("github_username", data.github_username);
+        }
+
+        setUserDetails({
+          nickname: data.nickname,
+          user_id: data.user_id, // Store user_id for GitHub modal
+          loginMethod: "regular",
         });
-        navigate('/MainPage'); // Navigate to the Main Page on success
+
+        if (!data.github_username) {
+          localStorage.setItem("github_username", data.github_username);
+          setGithubModalOpen(true); // Show modal if GitHub username is null
+        } else {
+          navigate("/MainPage");
+        }
       } else {
         const errorData = await response.json();
         toast({
-          title: 'Login Failed',
-          description: errorData.message || 'Invalid username or password.',
-          status: 'error',
+          title: "Login Failed",
+          description: errorData.message || "Invalid username or password.",
+          status: "error",
           duration: 5000,
           isClosable: true,
         });
       }
     } catch (error) {
-      console.error('Error during login:', error);
+      console.error("Error during login:", error);
       toast({
-        title: 'Network Error',
-        description: 'Unable to connect to the server.',
-        status: 'error',
+        title: "Network Error",
+        description: "Unable to connect to the server.",
+        status: "error",
         duration: 5000,
         isClosable: true,
       });
     }
   };
 
-  // Handle navigation to Create Account Page
-  const handleCreateAccount = () => {
-    navigate('/CreateAccountPage');
-  };
-
   // Handle Google login success
-  const handleGoogleLoginSuccess = (user: GoogleUser) => {
-    console.log('Google login successful:', user);
-    navigate('/MainPage');
-  };
+
+// Handle Google login success
+const handleGoogleLoginSuccess = async (savedUser: GoogleUser, githubUsernameMissing: boolean) => {
+  try {
+    // Save user data to localStorage
+    localStorage.setItem("nickname", savedUser.nickname);
+    if (savedUser.user_id) {
+      localStorage.setItem("user_id", savedUser.user_id);
+    }
+
+  // Save GitHub username to localStorage if it exists
+  if (savedUser.github_username) {
+    localStorage.setItem("github_username", savedUser.github_username);
+  } else {
+    localStorage.removeItem("github_username"); // Ensure it is cleared if missing
+  }
+
+    // Update user details state
+    setUserDetails({
+      nickname: savedUser.nickname,
+      user_id: savedUser.user_id,
+      loginMethod: "google",
+    });
+
+    // Check if GitHub username is missing
+    if (githubUsernameMissing) {
+      setGithubModalOpen(true);
+    } else {
+      toast({
+        title: "Login Successful",
+        description: `Welcome back, ${savedUser.nickname}!`,
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+      navigate("/MainPage");
+    }
+  } catch (error) {
+    console.error("Error handling Google login success:", error);
+    toast({
+      title: "Login Failed",
+      description: "Unable to complete login process",
+      status: "error",
+      duration: 5000,
+      isClosable: true,
+    });
+  }
+};
 
   // Handle Google login failure
   const handleGoogleLoginFailure = (error: string) => {
-    console.error('Google login failed:', error);
+    console.error("Google login failed:", error);
+    toast({
+      title: "Login Failed",
+      description: "Google login failed. Please try again.",
+      status: "error",
+      duration: 5000,
+      isClosable: true,
+    });
+  };
+
+// Handle GitHub username submission
+
+const handleGithubSave = async (githubUsername: string) => {
+  try {
+    if (!userDetails?.user_id) {
+      throw new Error("User ID is missing. Cannot save GitHub username.");
+    }
+
+    // Validate GitHub username (basic validation example)
+    const isValidGithubUsername = /^[a-zA-Z0-9-]+$/.test(githubUsername);
+    if (!isValidGithubUsername) {
+      toast({
+        title: "Invalid GitHub Username",
+        description: "GitHub username can only contain letters, numbers, and dashes.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    const apiUrl = `${import.meta.env.VITE_BACKEND_URL}/api/github/register-github-username/${userDetails.user_id}`;
+
+    const response = await fetch(apiUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        github_username: githubUsername,
+      }),
+    });
+
+    if (response.ok) {
+      // Save GitHub username locally for persistent state
+      localStorage.setItem("github_username", githubUsername);
+
+      toast({
+        title: "GitHub Username Saved!",
+        description: "Your GitHub username has been updated successfully.",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+
+      setGithubModalOpen(false);
+      navigate("/MainPage");
+    } else {
+      const errorData = await response.json();
+      toast({
+        title: "Error Saving GitHub Username",
+        description: errorData.message || "Something went wrong.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  } catch (error) {
+    console.error("Error updating GitHub username:", error);
+    toast({
+      title: "Network Error",
+      description: "Unable to connect to the server.",
+      status: "error",
+      duration: 5000,
+      isClosable: true,
+    });
+  }
+};
+
+  // Handle navigation to Create Account Page
+  const handleCreateAccount = () => {
+    navigate("/CreateAccountPage");
   };
 
   return (
@@ -120,7 +259,7 @@ const Login: React.FC = () => {
             color="white"
             value={formData.username}
             onChange={handleChange}
-            _placeholder={{ color: 'gray.400', fontSize: 'sm', fontWeight: 'normal' }}
+            _placeholder={{ color: "gray.400", fontSize: "sm", fontWeight: "normal" }}
             border="none"
             borderRadius="full"
           />
@@ -139,7 +278,7 @@ const Login: React.FC = () => {
             color="white"
             value={formData.password}
             onChange={handleChange}
-            _placeholder={{ color: 'gray.400', fontSize: 'sm', fontWeight: 'normal' }}
+            _placeholder={{ color: "gray.400", fontSize: "sm", fontWeight: "normal" }}
             border="none"
             borderRadius="full"
           />
@@ -152,7 +291,7 @@ const Login: React.FC = () => {
           color="white"
           borderRadius="full"
           mb={4}
-          _hover={{ bg: 'red.500' }}
+          _hover={{ bg: "red.500" }}
           onClick={handleSignIn}
         >
           Sign In
@@ -179,12 +318,19 @@ const Login: React.FC = () => {
           border="1px solid white"
           color="white"
           borderRadius="full"
-          _hover={{ bg: 'white', color: 'black' }}
+          _hover={{ bg: "white", color: "black" }}
           onClick={handleCreateAccount}
         >
           Create an Account
         </Button>
       </Box>
+
+      {/* GitHub Username Modal */}
+      <GitHubUsernameModal
+        isOpen={githubModalOpen}
+        onClose={() => setGithubModalOpen(false)}
+        onSave={handleGithubSave}
+      />
 
       {/* Background Moon Image */}
       <Image

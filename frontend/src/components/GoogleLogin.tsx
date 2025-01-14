@@ -4,7 +4,7 @@ import { GoogleUser } from "../types/GoogleUser";
 import { Box, Button, Image, useToast } from "@chakra-ui/react";
 
 interface GoogleLoginProps {
-  onLoginSuccess: (user: GoogleUser) => void;
+  onLoginSuccess: (user: GoogleUser, githubUsernameMissing: boolean) => void;
   onLoginFailure: (error: string) => void;
 }
 
@@ -34,37 +34,55 @@ const GoogleLoginComponent: React.FC<GoogleLoginProps> = ({
         }
 
         const data = await response.json();
-
+        
+        // Create user object with ONLY the required fields
         const user: GoogleUser = {
           google_email: data.email,
-          nickname: data.name,
+          nickname: data.name
         };
 
-        // Send user info to backend to store in MongoDB
-        const backendResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/google-login`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(user),
-        });
+        console.log("Sending to backend:", user); // Debug log
 
-        if (backendResponse.ok) {
-          const savedUser = await backendResponse.json();
-          onLoginSuccess(savedUser);
+        const backendResponse = await fetch(
+          `${import.meta.env.VITE_BACKEND_URL}/api/auth/google-login`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(user),
+          }
+        );
+
+        if (!backendResponse.ok) {
+          const errorData = await backendResponse.json();
+          console.error("Backend error response:", errorData);
+          throw new Error(errorData.message || "Failed to save user info to the database");
+        }
+
+        const savedUser = await backendResponse.json();
+        console.log("Backend success response:", savedUser);
+
+        localStorage.setItem("nickname", savedUser.nickname);
+        if (savedUser.user_id) {
+          localStorage.setItem("user_id", savedUser.user_id);
+        }
+        
+        if (!savedUser.github_username) {
+          onLoginSuccess(savedUser, true);
+        } else {
+          onLoginSuccess(savedUser, false);
           toast({
             title: "Login Successful",
-            description: "Welcome to You:Niverse!",
+            description: `Welcome back, ${savedUser.nickname}!`,
             status: "success",
             duration: 3000,
             isClosable: true,
           });
-        } else {
-          throw new Error("Failed to save user info to the database");
         }
       } catch (error) {
         console.error("Error during Google login:", error);
-        onLoginFailure("Failed to save user info to the database.");
+        onLoginFailure(error instanceof Error ? error.message : "Failed to save user info to the database.");
         toast({
           title: "Login Failed",
           description: "Unable to sign in with Google",
@@ -99,7 +117,7 @@ const GoogleLoginComponent: React.FC<GoogleLoginProps> = ({
         justifyContent="center"
         mb={4}
         _hover={{ bg: "gray.200" }}
-        onClick={() => login()} // Trigger Google login flow
+        onClick={() => login()}
       >
         <Image src="/images/google.png" alt="Google Icon" boxSize="40px" mr={2} />
         Sign in with Google

@@ -43,7 +43,7 @@ const Home: React.FC = () => {
         w="90vw"
         h="90vh"
         minW="1200px"
-        minH="800px"
+        minH="600px"
         bgColor="black"
         zIndex={2}
       >
