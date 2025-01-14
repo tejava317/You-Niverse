@@ -99,9 +99,13 @@ const handleGoogleLoginSuccess = async (savedUser: GoogleUser, githubUsernameMis
   try {
     // Save user data to localStorage
     localStorage.setItem("nickname", savedUser.nickname);
-    if (savedUser.user_id) {
-      localStorage.setItem("user_id", savedUser.user_id);
+    if (!savedUser.user_id) {
+      console.error("No user_id received from Google login");
+      throw new Error("Login failed: No user ID received");
     }
+    
+    // user_id를 localStorage에 저장
+    localStorage.setItem("user_id", savedUser.user_id);
 
   // Save GitHub username to localStorage if it exists
   if (savedUser.github_username) {

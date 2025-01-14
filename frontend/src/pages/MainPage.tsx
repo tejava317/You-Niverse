@@ -1,19 +1,33 @@
-//MainPage.tsx
 import * as React from "react";
 import { Box, Text, Image } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import ChangePlanet from "../components/ChangePlanet";
 import { IconButton } from "@chakra-ui/react";
 import { FaUser } from "react-icons/fa";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import UserInfoModal from "../components/UserInfoModal";
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedPlanet, setSelectedPlanet] = useState<{ name: string; video: string } | null>(null);
+  const [userId, setUserId] = useState<string>('');
+
+  useEffect(() => {
+    // localStorage에서 userId 가져오기
+    const storedUserId = localStorage.getItem('userId');
+    if (storedUserId) {
+      setUserId(storedUserId);
+    }
+  }, []);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
+
+  const handlePlanetChange = (planet: { name: string; video: string }) => {
+    setSelectedPlanet(planet);
+    // 필요한 경우 여기에 추가 로직 구현
+  };
 
   return (
     <Box
@@ -26,7 +40,6 @@ const Home: React.FC = () => {
       alignItems="center"
       justifyContent="center"
     >
-      {/* Central Content Box with black background */}
       <Box
         position="relative"
         w="90vw"
@@ -36,10 +49,11 @@ const Home: React.FC = () => {
         bgColor="black"
         zIndex={2}
       >
-        {/* Change Planet Component */}
-        <ChangePlanet onPlanetChange={() => {}} />
+        <ChangePlanet 
+          onPlanetChange={handlePlanetChange}
+          userId={userId}
+        />
 
-        {/* Header Text */}
         <Box
           position="absolute"
           top="12%"
@@ -57,7 +71,6 @@ const Home: React.FC = () => {
           </Text>
         </Box>
 
-        {/* User Icon */}
         <Box position="absolute" top="5px" left="5px" zIndex={5}>
           <IconButton
             icon={<FaUser />}
@@ -74,7 +87,6 @@ const Home: React.FC = () => {
           />
         </Box>
 
-        {/* Next Page Button */}
         <Box
           as="button"
           position="absolute"
@@ -102,7 +114,6 @@ const Home: React.FC = () => {
         </Box>
       </Box>
 
-      {/* Moon background image */}
       <Image
         src="/images/moon.png"
         alt="Moon Image"
@@ -114,7 +125,6 @@ const Home: React.FC = () => {
         zIndex={1}
       />
 
-      {/* User Info Modal */}
       <UserInfoModal isOpen={isModalOpen} onClose={closeModal} />
     </Box>
   );

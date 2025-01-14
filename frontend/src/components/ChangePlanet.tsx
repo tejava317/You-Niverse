@@ -1,6 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { IconButton, Box, Image, Text } from "@chakra-ui/react";
 import { ArrowBackIcon, ArrowForwardIcon } from "@chakra-ui/icons";
+import { useNavigate } from "react-router-dom";
+import { getProjectsByUserId } from '../utils/db';  // db.ts에서 함수 import
+
+interface Planet {
+  name: string;
+  video: string;
+  image: string;
+}
+
+interface Project {
+  userId: string;
+  projectName: string;
+  projectId: string;
+  createdAt: string;
+}
 
 // 행성 데이터
 const planetData = [
@@ -14,66 +29,129 @@ const planetData = [
   { name: "Neptune", video: "/images/neptune.mp4", image: "/images/neptune.png" },
 ];
 
-// 고정 위치 데이터
 const fixedPositions = [
-  { top: "48%", left: "7%" },  // 왼쪽 첫번째
-  { top: "48%", left: "22%" }, // 왼쪽 두번째
-  { top: "48%", left: "78%" }, // 오른쪽 첫번째
-  { top: "48%", left: "93%" }, // 오른쪽 두번째
+  { top: "48%", left: "7%" },
+  { top: "48%", left: "22%" },
+  { top: "48%", left: "78%" },
+  { top: "48%", left: "93%" },
 ];
 
 interface ChangePlanetProps {
   onPlanetChange: (planet: { name: string; video: string }) => void;
+  userId: string;
 }
 
-const getProjectCountFromIndexedDB = async (): Promise<number> => {
-  return new Promise((resolve) => setTimeout(() => resolve(4), 500));
-};
-
-const FilteredPlanets = (projectCount: number) => {
-  return planetData.slice(0, projectCount);
-};
-
-const ChangePlanet: React.FC<ChangePlanetProps> = ({ onPlanetChange }) => {
-  const [currentIndex, setCurrentIndex] = useState(2); // 초기값을 2로 설정하여 달이 중앙에 오도록
-  const [filteredPlanets, setFilteredPlanets] = useState(planetData);
+const ChangePlanet: React.FC<ChangePlanetProps> = ({ onPlanetChange, userId }) => {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [filteredPlanets, setFilteredPlanets] = useState<Planet[]>([]);
 
   useEffect(() => {
     const fetchProjects = async () => {
-      const projectCount = await getProjectCountFromIndexedDB();
-      const planets = FilteredPlanets(projectCount);
-      setFilteredPlanets(planets);
+      try {
+        setLoading(true);
+        console.log("Current userId:", userId);
+        
+        // localStorage에서 userId 가져오기 시도
+        const storedUserId = localStorage.getItem('user_id');
+        console.log("Stored userId:", storedUserId);
+        
+        const currentUserId = userId || storedUserId;
+        
+        if (!currentUserId) {
+          console.log("No userId found");
+          setFilteredPlanets([]);
+          setLoading(false);
+          return;
+        }
+
+        // indexedDB에서 프로젝트 데이터 가져오기
+        console.log("Fetching projects for userId:", currentUserId);
+        const projectsData = await getProjectsByUserId(currentUserId);
+        console.log("Fetched projects:", projectsData);
+        
+        // 생성 시간순으로 정렬
+        const sortedProjects = projectsData.sort((a: { createdAt: string | number | Date; }, b: { createdAt: string | number | Date; }) => 
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        );
+        
+        // 정렬된 프로젝트 저장
+        setProjects(sortedProjects);
+        
+        // 프로젝트 수에 맞춰 행성 필터링
+        const availablePlanets = planetData.slice(0, sortedProjects.length);
+        setFilteredPlanets(availablePlanets);
+
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+        setFilteredPlanets([]);
+      } finally {
+        setLoading(false);
+      }
     };
+
     fetchProjects();
-  }, []);
+  }, [userId]);
+
+  useEffect(() => {
+    // 초기 행성 선택
+    if (filteredPlanets.length > 0) {
+      onPlanetChange(filteredPlanets[currentIndex]);
+    }
+  }, [filteredPlanets, currentIndex, onPlanetChange]);
+
+  if (loading) {
+    return (
+      <Box
+        position="absolute"
+        top="50%"
+        left="50%"
+        transform="translate(-50%, -50%)"
+      >
+        <Text color="white">Loading planets...</Text>
+      </Box>
+    );
+  }
+
+  if (!filteredPlanets.length) {
+    return (
+      <Box
+        position="absolute"
+        top="50%"
+        left="50%"
+        transform="translate(-50%, -50%)"
+        textAlign="center"
+      >
+        <Text color="white" mb={2}>No projects found.</Text>
+        <Text color="gray.400" fontSize="sm">
+          Create a project to see planets appear.
+        </Text>
+      </Box>
+    );
+  }
 
   const handleNext = () => {
     if (currentIndex < filteredPlanets.length - 1) {
-      const newIndex = currentIndex + 1;
-      setCurrentIndex(newIndex);
-      onPlanetChange(filteredPlanets[newIndex]);
+      setCurrentIndex(currentIndex + 1);
     }
   };
 
   const handleBack = () => {
     if (currentIndex > 0) {
-      const newIndex = currentIndex - 1;
-      setCurrentIndex(newIndex);
-      onPlanetChange(filteredPlanets[newIndex]);
+      setCurrentIndex(currentIndex - 1);
     }
   };
 
-  // 현재 표시할 행성들 계산
   const getVisiblePlanets = () => {
     const leftPlanets = [];
     const rightPlanets = [];
 
-    // 왼쪽 행성들 (현재 인덱스 이전)
     for (let i = Math.max(0, currentIndex - 2); i < currentIndex; i++) {
       leftPlanets.push(filteredPlanets[i]);
     }
 
-    // 오른쪽 행성들 (현재 인덱스 이후)
     for (let i = currentIndex + 1; i < Math.min(filteredPlanets.length, currentIndex + 3); i++) {
       rightPlanets.push(filteredPlanets[i]);
     }
@@ -84,9 +162,17 @@ const ChangePlanet: React.FC<ChangePlanetProps> = ({ onPlanetChange }) => {
   const { leftPlanets, rightPlanets } = getVisiblePlanets();
   const centralPlanet = filteredPlanets[currentIndex];
 
+  // 프로젝트 이름 가져오기 함수
+  const getProjectName = (planetIndex: number): string => {
+    if (planetIndex >= 0 && planetIndex < projects.length) {
+      return projects[planetIndex].projectName;
+    }
+    return '';
+  };
+
   return (
     <>
-      {/* Navigation Buttons */}
+      {/* Previous Button */}
       <IconButton
         icon={<ArrowBackIcon />}
         aria-label="Previous Planet"
@@ -105,6 +191,7 @@ const ChangePlanet: React.FC<ChangePlanetProps> = ({ onPlanetChange }) => {
         _hover={{ bg: "gray.600" }}
       />
 
+      {/* Next Button */}
       <IconButton
         icon={<ArrowForwardIcon />}
         aria-label="Next Planet"
@@ -160,6 +247,9 @@ const ChangePlanet: React.FC<ChangePlanetProps> = ({ onPlanetChange }) => {
           >
             {planet.name}
           </Text>
+          <Text color="gray.300" fontSize="xs" textAlign="center">
+            {getProjectName(filteredPlanets.indexOf(planet))}
+          </Text>
         </Box>
       ))}
 
@@ -200,10 +290,13 @@ const ChangePlanet: React.FC<ChangePlanetProps> = ({ onPlanetChange }) => {
           >
             {planet.name}
           </Text>
+          <Text color="gray.300" fontSize="xs" textAlign="center">
+            {getProjectName(filteredPlanets.indexOf(planet))}
+          </Text>
         </Box>
       ))}
 
-      {/* Black Box with Top Border */}
+      {/* Central Planet Info */}
       <Box
         position="absolute"
         top="81%"
@@ -216,7 +309,6 @@ const ChangePlanet: React.FC<ChangePlanetProps> = ({ onPlanetChange }) => {
         zIndex={5}
       />
 
-      {/* Central Planet Name */}
       <Text
         position="absolute"
         top="81%"
@@ -230,8 +322,20 @@ const ChangePlanet: React.FC<ChangePlanetProps> = ({ onPlanetChange }) => {
       >
         {centralPlanet.name}
       </Text>
+      <Text
+        position="absolute"
+        top="85%"
+        left="50%"
+        transform="translate(-50%, -50%)"
+        color="gray.300"
+        fontSize="md"
+        textAlign="center"
+        zIndex={9999}
+      >
+        {getProjectName(currentIndex)}
+      </Text>
 
-      {/* Circular Line with Video */}
+      {/* Central Video */}
       <Box
         position="absolute"
         top="55%"
@@ -261,7 +365,9 @@ const ChangePlanet: React.FC<ChangePlanetProps> = ({ onPlanetChange }) => {
               width: "100%",
               height: "100%",
               objectFit: "cover",
+              cursor: "pointer"
             }}
+            onDoubleClick={() => navigate("/PlanetProjectPage")}
           />
         </Box>
       </Box>

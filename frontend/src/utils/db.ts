@@ -1,3 +1,4 @@
+//db.ts
 export const initializeDatabase = (): Promise<IDBDatabase> => {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open("MyAppDatabase", 1);
