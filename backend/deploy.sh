@@ -6,7 +6,7 @@ SERVICE_NAME="you-niverse-app"
 REGION="asia-northeast3"
 
 # Re-create new builder and activate it
-docker-buildx rm multiarch 2>/dev/null
+# docker-buildx rm multiarch 2>/dev/null
 docker-buildx create --name multiarch --use
 docker-buildx inspect --bootstrap
 
