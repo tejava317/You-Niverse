@@ -102,6 +102,15 @@ const ChangePlanet: React.FC<ChangePlanetProps> = ({ onPlanetChange, userId }) =
     }
   }, [filteredPlanets, currentIndex, onPlanetChange]);
 
+
+  const handlePlanetClick = () => {
+    const centralProject = projects[currentIndex];
+    if (centralProject) {
+      navigate("/PlanetProjectPage", { state: { projectId: centralProject.projectId } });
+    }
+  };
+
+
   if (loading) {
     return (
       <Box
@@ -367,7 +376,7 @@ const ChangePlanet: React.FC<ChangePlanetProps> = ({ onPlanetChange, userId }) =
               objectFit: "cover",
               cursor: "pointer"
             }}
-            onDoubleClick={() => navigate("/PlanetProjectPage")}
+            onDoubleClick={handlePlanetClick}
           />
         </Box>
       </Box>

@@ -10,7 +10,7 @@ import UserInfoModal from "../components/UserInfoModal";
 const Home: React.FC = () => {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedPlanet, setSelectedPlanet] = useState<{ name: string; video: string } | null>(null);
+  const [, setSelectedPlanet] = useState<{ name: string; video: string } | null>(null);
   const [userId, setUserId] = useState<string>('');
 
   useEffect(() => {
