@@ -108,9 +108,9 @@ def get_consecutive_commit_days(commits):
     if not unique_dates:
         return 0
     
-    yesterday = datetime.today().date() - timedelta(days=1)
+    today = datetime.today().date()
     consecutive_days = 0
-    current_day = yesterday
+    current_day = today
 
     for d in unique_dates:
         if d == current_day:
@@ -118,10 +118,6 @@ def get_consecutive_commit_days(commits):
             current_day -= timedelta(days=1)
         else:
             break
-    
-    today = datetime.today().date()
-    if today in unique_dates:
-        consecutive_days += 1
 
     return consecutive_days
 
