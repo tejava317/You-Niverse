@@ -9,7 +9,7 @@ class CreateProjectRequest(BaseModel):
     project_end: str = Field(..., description="End date in YYYY-MM-DD format")
     owner_username: str
     github_repo: str
-    
+
     @field_validator("project_start", "project_end")
     def validate_date_format(cls, value):
         try:
@@ -36,6 +36,7 @@ class GetProjectInfoResponse(BaseModel):
     message: str
     project_name: str
     d_day: str
+    progress: float
     done: str | None
     todo: str | None
     idea: str | None

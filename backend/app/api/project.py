@@ -12,8 +12,15 @@ from app.schemas.project import (
     UpdateScrumResponse
 )
 from app.utils.crypt import generate_project_id
-from app.utils.github import validate_github_username, validate_github_repo
-from app.utils.project import get_sequential_planet_index, compute_project_d_day
+from app.utils.github import (
+    validate_github_username,
+    validate_github_repo
+)
+from app.utils.project import (
+    get_sequential_planet_index,
+    compute_project_d_day,
+    compute_progress
+)
 
 router = APIRouter()
 
@@ -96,6 +103,7 @@ async def load_project_info(user_id: str, project_id: str, db=Depends(get_db)):
             raise HTTPException(status_code=404, detail="Project not found")
         
         d_day = compute_project_d_day(project["project_end"])
+        progress = compute_progress(project["project_start"], project["project_end"])
 
         scrum_collection = db["scrum"]
         today_date = datetime.now().strftime("%Y-%m-%d")
@@ -115,6 +123,7 @@ async def load_project_info(user_id: str, project_id: str, db=Depends(get_db)):
             "message": "Project information successfully retrieved",
             "project_name": project["project_name"],
             "d_day": d_day,
+            "progress": progress,
             "done": today_scrum.get("done"),
             "todo": today_scrum.get("todo"),
             "idea": today_scrum.get("idea")

@@ -90,7 +90,7 @@ async def google_login(request: GoogleLoginRequest, db=Depends(get_db)):
         user_id = generate_user_id()
         user_data = {
             "user_id": user_id,
-            "login_type": "general",
+            "login_type": "google",
             "username": None,
             "password": None,
             "google_email": request.google_email,
