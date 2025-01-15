@@ -35,6 +35,8 @@ class CreateProjectResponse(BaseModel):
 class GetProjectInfoResponse(BaseModel):
     message: str
     project_name: str
+    owner_name: str
+    github_repo: str
     d_day: str
     progress: float
     done: str | None

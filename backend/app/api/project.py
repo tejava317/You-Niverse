@@ -122,6 +122,8 @@ async def load_project_info(user_id: str, project_id: str, db=Depends(get_db)):
         return {
             "message": "Project information successfully retrieved",
             "project_name": project["project_name"],
+            "owner_name": project["owner_username"],
+            "github_repo": project["github_repo"],
             "d_day": d_day,
             "progress": progress,
             "done": today_scrum.get("done"),
