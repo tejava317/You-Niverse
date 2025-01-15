@@ -1,10 +1,21 @@
-//StreaksBox.tsx
 import React, { useEffect, useState } from "react";
 import { Box, Text, Image, Flex } from "@chakra-ui/react";
+import { getProjectById } from "../utils/db"; // IndexedDB 함수 import
 
 interface StreaksBoxProps {
   project_id: string | undefined; // project_id를 Prop으로 정의
 }
+
+
+
+
+const getStreakImage = (streak: number): string => {
+  if (streak >= 8) return "/images/우주선_step4.png";
+  if (streak >= 6) return "/images/우주선_step3.png";
+  if (streak >= 4) return "/images/우주선_step2.png";
+  if (streak >= 1) return "/images/우주선_step1.png";
+  return "/images/우주선_step0.png";
+};
 
 const StreaksBox: React.FC<StreaksBoxProps> = ({ project_id }) => {
   const [streakData, setStreakData] = useState<{
@@ -14,6 +25,7 @@ const StreaksBox: React.FC<StreaksBoxProps> = ({ project_id }) => {
 
   const [commitsToday, setCommitsToday] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [dDay, setDday] = useState<number | null>(null); // D-Day 상태 추가
 
   useEffect(() => {
     const fetchData = async () => {
@@ -56,6 +68,20 @@ const StreaksBox: React.FC<StreaksBoxProps> = ({ project_id }) => {
         const commitsData = await commitsResponse.json();
         console.log("Fetched Commits Today Data:", commitsData);
         setCommitsToday(commitsData.commits_today);
+
+        // Fetch D-Day data from /api/project/load-project-info
+        const projectInfoUrl = `${import.meta.env.VITE_BACKEND_URL}/api/project/load-project-info/${user_id}/${project_id}`;
+        console.log("Project Info API URL:", projectInfoUrl);
+        const projectInfoResponse = await fetch(projectInfoUrl);
+        console.log("Project Info API Response Status:", projectInfoResponse.status);
+
+        if (!projectInfoResponse.ok) {
+          throw new Error(`Failed to fetch project info: ${projectInfoResponse.statusText}`);
+        }
+
+        const projectInfoData = await projectInfoResponse.json();
+        console.log("Fetched Project Info Data:", projectInfoData);
+        setDday(projectInfoData.d_day || "N/A");
       } catch (error) {
         console.error("Error fetching data:", error);
         setError(error instanceof Error ? error.message : "Unknown error occurred");
@@ -83,7 +109,7 @@ const StreaksBox: React.FC<StreaksBoxProps> = ({ project_id }) => {
         >
           {/* Spaceship Image */}
           <Image
-            src="/images/우주선_step0.png"
+            src={streakData ? getStreakImage(streakData.streak) : "/images/우주선_step0.png"}
             alt="Streaks Image"
             maxW="100%"
             maxH="100%"
@@ -132,7 +158,7 @@ const StreaksBox: React.FC<StreaksBoxProps> = ({ project_id }) => {
             justifyContent="center"
           >
             <Text fontSize="2xl" color="white" fontWeight="bold">
-              D-7
+              {dDay !== null ? `${dDay}` : "Calculating..."}
             </Text>
           </Box>
         </Box>
