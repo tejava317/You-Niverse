@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Text,
@@ -14,32 +14,131 @@ import { useNavigate } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { ArrowBackIcon, CalendarIcon } from "@chakra-ui/icons";
+import {saveProject} from "../utils/db"
 
 const AddPlanet: React.FC = () => {
   const navigate = useNavigate();
   const toast = useToast();
-  const userId = "your_user_id_here"; // Replace with the actual user ID from context or props
-  const [currentPlanet] = React.useState({
+
+  const user_id = localStorage.getItem("user_id"); // Get user_id from localStorage
+  const [currentPlanet] = useState({
     name: "Mercury",
     video: "/images/mercury.mp4",
   });
 
-  const [startDate, setStartDate] = React.useState<Date | null>(null);
-  const [endDate, setEndDate] = React.useState<Date | null>(null);
-  const [projectName, setProjectName] = React.useState("");
-  const [githubPrefix, setGithubPrefix] = React.useState("callasio");
-  const [githubRepo, setGithubRepo] = React.useState("");
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [projectName, setProjectName] = useState("");
+  const [githubPrefix, setGithubPrefix] = useState(localStorage.getItem("github_username") || "callasio");
+  const [githubRepo, setGithubRepo] = useState("");
 
-  const handleSaveProject = () => {
-    const savedProject = {
-      projectName,
-      StartDate: startDate?.toISOString() || null,
-      EndDate: endDate?.toISOString() || null,
-      GithubAddress: `https://github.com/${githubPrefix}/${githubRepo}`,
+  // Function to handle saving the project
+  const handleSaveProject = async () => {
+    if (!user_id) {
+      toast({
+        title: "User ID Missing",
+        description: "Unable to save project without a valid user ID.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    if (!projectName || !startDate || !endDate || !githubRepo) {
+      toast({
+        title: "Missing Fields",
+        description: "Please fill out all fields before saving.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+      return;
+    }
+
+
+    const formatDate = (date: Date) => {
+      return date.toISOString().split("T")[0]; // Extract yyyy-mm-dd
     };
 
-    console.log("Saved Project:", savedProject);
-    alert("Project saved!");
+
+
+    //backend project data schema
+    const projectData = {
+      project_name: projectName,
+      project_start: formatDate(startDate),
+      project_end: formatDate(endDate),
+      owner_username: githubPrefix,
+      github_repo: githubRepo,
+    };
+
+     // Log projectData to see the structure and values
+     console.log("Project Data:", projectData);
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/project/create-project/${user_id}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(projectData),
+        }
+      );
+
+      if (response.ok) {
+
+        const data = await response.json(); // The response from the backend
+        const { project_id, project_name } = data;
+
+
+        // IndexedDB project schema
+        const indexedDBProject = {
+          user_id,
+          projectName,
+          project_id: project_id,
+          createdAt: new Date().toISOString(),
+          project_start:formatDate(startDate),
+          project_end:formatDate(endDate),
+        };
+
+         // Save to IndexedDB
+         await saveProject(indexedDBProject);
+
+      //   // Save project details locally
+      // const savedProjects = JSON.parse(localStorage.getItem("projects") || "[]");
+      // savedProjects.push({ project_id, project_name });
+      // localStorage.setItem("projects", JSON.stringify(savedProjects));
+      
+        toast({
+          title: "Project Saved!",
+          description: "Your project has been added successfully.",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+        navigate("/MainPage");
+      } else {
+        const errorData = await response.json();
+        toast({
+          title: "Error Saving Project",
+          description: errorData.message || "Something went wrong.",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      }
+    } catch (error) {
+      console.error("Error saving project:", error);
+      toast({
+        title: "Network Error",
+        description: "Unable to connect to the server.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
   };
 
   const handleBackToMain = () => {
@@ -93,8 +192,8 @@ const AddPlanet: React.FC = () => {
         position="relative"
         w="90vw"
         h="90vh"
-        minW="1350px"
-        minH="800px"
+        minW="1200px"
+        minH="600px"
         bgColor="black"
         zIndex={2}
       >

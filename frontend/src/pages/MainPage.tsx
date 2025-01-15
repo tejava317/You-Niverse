@@ -4,27 +4,30 @@ import { useNavigate } from "react-router-dom";
 import ChangePlanet from "../components/ChangePlanet";
 import { IconButton } from "@chakra-ui/react";
 import { FaUser } from "react-icons/fa";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import UserInfoModal from "../components/UserInfoModal";
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
-  const [currentPlanet, setCurrentPlanet] = React.useState({
-    name: "Mercury",
-    video: "/images/mercury.mp4",
-  });
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [, setSelectedPlanet] = useState<{ name: string; video: string } | null>(null);
+  const [user_id, setUserId] = useState<string>('');
 
-  const handlePlanetChange = (planet: { name: string; video: string }) => {
-    setCurrentPlanet(planet);
-  };
-
-  const handleNavigation = () => {
-    navigate("/AddPlanetPage");
-  };
+  useEffect(() => {
+    // localStorage에서 userId 가져오기
+    const storedUserId = localStorage.getItem('userId');
+    if (storedUserId) {
+      setUserId(storedUserId);
+    }
+  }, []);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
+
+  const handlePlanetChange = (planet: { name: string; video: string }) => {
+    setSelectedPlanet(planet);
+    // 필요한 경우 여기에 추가 로직 구현
+  };
 
   return (
     <Box
@@ -37,72 +40,23 @@ const Home: React.FC = () => {
       alignItems="center"
       justifyContent="center"
     >
-      {/* Central Content Box with black background */}
       <Box
         position="relative"
         w="90vw"
         h="90vh"
         minW="1200px"
-        minH="800px"
+        minH="600px"
         bgColor="black"
         zIndex={2}
       >
-        {/* Change Planet Component */}
-        <ChangePlanet onPlanetChange={handlePlanetChange} />
-
-        {/* Circular Line with Video */}
-        <Box
-          position="absolute"
-          top="55%"
-          left="50%"
-          transform="translate(-50%, -50%)"
-          w="350px"
-          h="350px"
-          border="0.05px solid rgba(255, 255, 255, 0.2)"
-          borderRadius="50%"
-          overflow="hidden"
-          zIndex={4}
-        >
-          <Box
-            position="absolute"
-            top="50%"
-            left="50%"
-            transform="translate(-50%, -50%)"
-            w="250px"
-            h="250px"
-          >
-            <video
-              src={currentPlanet.video}
-              autoPlay
-              loop
-              muted
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-              }}
-              onDoubleClick={() => navigate("/PlanetProjectPage")}
-            />
-          </Box>
-        </Box>
-
-        {/* Black Box under planet name */}
-        <Box
-          position="absolute"
-          top="79.5%"
-          left="50%"
-          transform="translate(-50%, -50%)"
-          w="150px"
-          h="100px"
-          bg="black"
-          borderTop="0.05px solid rgba(255, 255, 255, 0.2)"
-          zIndex={4}
+        <ChangePlanet 
+          onPlanetChange={handlePlanetChange}
+          user_id={user_id}
         />
 
-        {/* Header Text */}
         <Box
           position="absolute"
-          top="20%"
+          top="12%"
           left="50%"
           transform="translate(-50%, -50%)"
           zIndex={3}
@@ -117,7 +71,6 @@ const Home: React.FC = () => {
           </Text>
         </Box>
 
-        {/* User Icon */}
         <Box position="absolute" top="5px" left="5px" zIndex={5}>
           <IconButton
             icon={<FaUser />}
@@ -134,7 +87,6 @@ const Home: React.FC = () => {
           />
         </Box>
 
-        {/* Next Page Button */}
         <Box
           as="button"
           position="absolute"
@@ -156,13 +108,12 @@ const Home: React.FC = () => {
           _hover={{
             opacity: 0.9,
           }}
-          onClick={handleNavigation}
+          onClick={() => navigate("/AddPlanetPage")}
         >
           <Text fontSize="sm">Add a Planet</Text>
         </Box>
       </Box>
 
-      {/* Moon background image */}
       <Image
         src="/images/moon.png"
         alt="Moon Image"
@@ -174,7 +125,6 @@ const Home: React.FC = () => {
         zIndex={1}
       />
 
-      {/* User Info Modal */}
       <UserInfoModal isOpen={isModalOpen} onClose={closeModal} />
     </Box>
   );
