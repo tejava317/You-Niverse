@@ -18,7 +18,6 @@ const FlightForm: React.FC<FlightFormProps> = ({ user_id, project_id, planetName
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-
   useEffect(() => {
     console.log("Debug: FlightForm Props:", {
       user_id,
@@ -77,6 +76,7 @@ const FlightForm: React.FC<FlightFormProps> = ({ user_id, project_id, planetName
       }
     };
 
+    if (user_id === "") return;
     fetchProjectInfo();
   }, [user_id, project_id]);
 
@@ -107,19 +107,37 @@ const FlightForm: React.FC<FlightFormProps> = ({ user_id, project_id, planetName
         <Text fontSize="sm" color="gray.400" mb={2}>
           Planet Name
         </Text>
-        <Text
+        <Flex
           bg="black"
           color="white"
           border="1px solid white"
           h="40px"
-          display="flex"
           alignItems="center"
           justifyContent="center"
           fontSize="sm"
           borderRadius="0"
+          position="relative"
         >
-          {planetName}
-        </Text>
+          <Box
+            position="absolute"
+            left={130}
+            w="30px"
+            h="30px"
+            display="flex"
+            alignItems="center"
+          >
+            <img
+              src={`/images/${planetName.toLowerCase()}.png`}
+              alt={planetName}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain'
+              }}
+            />
+          </Box>
+          <Text>{planetName}</Text>
+        </Flex>
       </Box>
 
       {/* Project Name Section */}
@@ -140,6 +158,59 @@ const FlightForm: React.FC<FlightFormProps> = ({ user_id, project_id, planetName
         >
           {projectName}
         </Text>
+      </Box>
+
+      {/* GitHub Section */}
+      <Box flex="1">
+        <Text fontSize="sm" color="gray.400" mb={2}>
+          GitHub
+        </Text>
+        <a
+          href={`https://github.com/${projectInfo.owner_name}/${projectInfo.github_repo}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ width: '100%', textDecoration: 'none' }}
+        >
+          <Text
+            bg="black"
+            color="white"
+            border="1px solid white"
+            h="40px"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            fontSize="sm"
+            borderRadius="0"
+            px={4}
+            overflow="hidden"
+            textOverflow="ellipsis"
+            whiteSpace="nowrap"
+            _hover={{
+              color: 'blue.300',
+              borderColor: 'blue.300',
+            }}
+            transition="all 0.2s"
+          >
+            <Box
+              w="20px"
+              h="20px"
+              mr={2} /* Adds spacing between the image and text */
+              display="flex"
+              alignItems="center"
+            >
+              <img
+                src={`/images/github.png`}
+                alt="GitHub logo"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'contain',
+                }}
+              />
+            </Box>
+            /{projectInfo.owner_name}/{projectInfo.github_repo}
+          </Text>
+        </a>
       </Box>
     </Flex>
   );

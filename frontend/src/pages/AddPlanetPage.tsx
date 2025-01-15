@@ -43,9 +43,9 @@ const AddPlanet: React.FC = () => {
 
 
   useEffect(() => {
-    const totalPlanets = Number(localStorage.getItem("totalPlanets")) || 1;
-    const planetIndex = Math.max(0, totalPlanets); // totalPlanets - 1, 최소값 0 보장
-    setCurrentPlanet(planetData[planetIndex % planetData.length]);
+    const totalPlanets = Number(localStorage.getItem("totalPlanets")) || 0; // 기본값을 0으로 설정
+    const planetIndex = totalPlanets; // totalPlanets를 그대로 사용
+    setCurrentPlanet(planetData[planetIndex % planetData.length]); // 올바른 행성을 설정
   }, []);
 
   // Function to handle saving the project
