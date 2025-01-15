@@ -22,7 +22,7 @@ interface Project {
 const planetData = [
   { name: "Mercury", video: "/images/mercury.mp4", image: "/images/mercury.png" },
   { name: "Venus", video: "/images/venus.mp4", image: "/images/venus.png" },
-  { name: "Moon", video: "/images/example.mp4", image: "/images/moonImage.png" },
+  { name: "Moon", video: "/images/moon.mp4", image: "/images/moonImage.png" },
   { name: "Mars", video: "/images/mars.mp4", image: "/images/mars.png" },
   { name: "Jupiter", video: "/images/jupiter.mp4", image: "/images/jupiter.png" },
   { name: "Saturn", video: "/images/saturn.mp4", image: "/images/saturn.png" },
@@ -85,6 +85,10 @@ const ChangePlanet: React.FC<ChangePlanetProps> = ({ onPlanetChange, user_id }) 
         const availablePlanets = planetData.slice(0, sortedProjects.length);
         setFilteredPlanets(availablePlanets);
 
+        // 총 행성 개수를 로컬 저장소에 저장 (한 번만)
+        localStorage.setItem("totalPlanets", String(availablePlanets.length));
+
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching projects:", error);
         setFilteredPlanets([]);
@@ -189,7 +193,7 @@ const ChangePlanet: React.FC<ChangePlanetProps> = ({ onPlanetChange, user_id }) 
         aria-label="Previous Planet"
         position="absolute"
         bottom="42%"
-        left="35%"
+        left="36.1%"
         w="40px"
         h="40px"
         borderRadius="50%"
@@ -208,7 +212,7 @@ const ChangePlanet: React.FC<ChangePlanetProps> = ({ onPlanetChange, user_id }) 
         aria-label="Next Planet"
         position="absolute"
         bottom="42%"
-        left="62%"
+        left="60.9%"
         w="40px"
         h="40px"
         borderRadius="50%"
@@ -310,7 +314,7 @@ const ChangePlanet: React.FC<ChangePlanetProps> = ({ onPlanetChange, user_id }) 
       {/* Central Planet Info */}
       <Box
         position="absolute"
-        top="81%"
+        top="76%"
         left="50%"
         transform="translate(-50%, -50%)"
         w="180px"
@@ -322,7 +326,7 @@ const ChangePlanet: React.FC<ChangePlanetProps> = ({ onPlanetChange, user_id }) 
 
       <Text
         position="absolute"
-        top="81%"
+        top="78%"
         left="50%"
         transform="translate(-50%, -50%)"
         color="white"
@@ -335,7 +339,7 @@ const ChangePlanet: React.FC<ChangePlanetProps> = ({ onPlanetChange, user_id }) 
       </Text>
       <Text
         position="absolute"
-        top="85%"
+        top="82%"
         left="50%"
         transform="translate(-50%, -50%)"
         color="gray.300"

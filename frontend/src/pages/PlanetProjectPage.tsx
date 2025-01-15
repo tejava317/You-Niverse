@@ -52,7 +52,7 @@ const PlanetProject: React.FC = () => {
       <Box w="90%" maxW="1400px" h="85vh" display="flex" flexDirection="column" gap={6}>
         <Header />
         <FlightForm />
-        <ProgressBar />
+        <ProgressBar project_id={project_id} />
         <Flex w="100%" gap={4}>
           <StreaksBox 
           project_id={project_id}

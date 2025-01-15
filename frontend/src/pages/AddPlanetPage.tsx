@@ -16,21 +16,37 @@ import "react-datepicker/dist/react-datepicker.css";
 import { ArrowBackIcon, CalendarIcon } from "@chakra-ui/icons";
 import {saveProject} from "../utils/db"
 
+
+const planetData = [
+  { name: "Mercury", video: "/images/mercury.mp4" },
+  { name: "Venus", video: "/images/venus.mp4" },
+  { name: "Moon", video: "/images/moon.mp4" },
+  { name: "Mars", video: "/images/mars.mp4" },
+  { name: "Jupiter", video: "/images/jupiter.mp4" },
+  { name: "Saturn", video: "/images/saturn.mp4" },
+  { name: "Uranus", video: "/images/uranus.mp4" },
+  { name: "Neptune", video: "/images/neptune.mp4" },
+];
+
 const AddPlanet: React.FC = () => {
   const navigate = useNavigate();
   const toast = useToast();
 
   const user_id = localStorage.getItem("user_id"); // Get user_id from localStorage
-  const [currentPlanet] = useState({
-    name: "Mercury",
-    video: "/images/mercury.mp4",
-  });
+  const [currentPlanet, setCurrentPlanet] = useState(planetData[0]);
 
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [projectName, setProjectName] = useState("");
   const [githubPrefix, setGithubPrefix] = useState(localStorage.getItem("github_username") || "callasio");
   const [githubRepo, setGithubRepo] = useState("");
+
+
+  useEffect(() => {
+    const totalPlanets = Number(localStorage.getItem("totalPlanets")) || 1;
+    const planetIndex = Math.max(0, totalPlanets); // totalPlanets - 1, 최소값 0 보장
+    setCurrentPlanet(planetData[planetIndex % planetData.length]);
+  }, []);
 
   // Function to handle saving the project
   const handleSaveProject = async () => {
@@ -90,7 +106,7 @@ const AddPlanet: React.FC = () => {
       if (response.ok) {
 
         const data = await response.json(); // The response from the backend
-        const { project_id, project_name } = data;
+        const { project_id } = data;
 
 
         // IndexedDB project schema
@@ -106,11 +122,13 @@ const AddPlanet: React.FC = () => {
          // Save to IndexedDB
          await saveProject(indexedDBProject);
 
-      //   // Save project details locally
-      // const savedProjects = JSON.parse(localStorage.getItem("projects") || "[]");
-      // savedProjects.push({ project_id, project_name });
-      // localStorage.setItem("projects", JSON.stringify(savedProjects));
+
       
+       // Update the planet index
+       const currentPlanetIndex = Number(localStorage.getItem("currentPlanetIndex")) || 0;
+       const nextPlanetIndex = (currentPlanetIndex + 1) % planetData.length;
+       localStorage.setItem("currentPlanetIndex", String(nextPlanetIndex));
+
         toast({
           title: "Project Saved!",
           description: "Your project has been added successfully.",
@@ -144,7 +162,17 @@ const AddPlanet: React.FC = () => {
   const handleBackToMain = () => {
     navigate("/MainPage");
   };
-
+  const handleDateChange = (date: Date | null, setDate: (date: Date | null) => void) => {
+    if (date) {
+      // 시간 보정: 로컬 시간대를 제거하여 UTC 자정으로 설정
+      const correctedDate = new Date(
+        Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
+      );
+      setDate(correctedDate);
+    }
+  };
+  
+  
   // Custom Input for react-datepicker
   const CustomDateInput = React.forwardRef<HTMLInputElement, any>(
     ({ value, onClick }, ref) => (
@@ -174,8 +202,11 @@ const AddPlanet: React.FC = () => {
         <CalendarIcon color="white" ml={2} />
       </Flex>
     )
+    
+    
   );
 
+  
   return (
     <Box
       bgColor="black"
@@ -228,10 +259,39 @@ const AddPlanet: React.FC = () => {
                 height: "100%",
                 objectFit: "cover",
               }}
-              onDoubleClick={() => navigate("/PlanetProjectPage")}
+              
             />
           </Box>
         </Box>
+        <Text
+          position="absolute"
+          top="77%"
+          left="25%"
+          transform="translate(-50%, -50%)"
+          color="white"
+          fontSize="xl"
+          fontWeight="bold"
+          textAlign="center"
+          zIndex={5}
+        >
+          {currentPlanet.name}
+        </Text>
+
+        {projectName && (
+          <Text
+            position="absolute"
+            top="80%"
+            left="25%"
+            transform="translate(-50%, -50%)"
+            color="gray.400"
+            fontSize="lg"
+            textAlign="center"
+            zIndex={6}
+          >
+            {projectName}
+          </Text>
+        )}
+
 
         {/* Black Box under planet name */}
         <Box
@@ -304,10 +364,10 @@ const AddPlanet: React.FC = () => {
               Start Date
             </FormLabel>
             <DatePicker
-              selected={startDate}
-              onChange={(date) => setStartDate(date)}
-              dateFormat="MMMM d, yyyy"
-              customInput={<CustomDateInput />}
+               selected={startDate}
+            onChange={(date) => handleDateChange(date, setStartDate)}
+            dateFormat="MMMM d, yyyy"
+            customInput={<CustomDateInput />}
             />
           </Box>
 
@@ -317,10 +377,10 @@ const AddPlanet: React.FC = () => {
               End Date
             </FormLabel>
             <DatePicker
-              selected={endDate}
-              onChange={(date) => setEndDate(date)}
-              dateFormat="MMMM d, yyyy"
-              customInput={<CustomDateInput />}
+             selected={endDate}
+             onChange={(date) => handleDateChange(date, setEndDate)}
+             dateFormat="MMMM d, yyyy"
+             customInput={<CustomDateInput />}
             />
           </Box>
 
@@ -389,7 +449,7 @@ const AddPlanet: React.FC = () => {
                   border="none"
                   value={githubRepo}
                   onChange={(e) => setGithubRepo(e.target.value)}
-                  _placeholder={{ color: "gray.500" }}
+                  _placeholder={{ color: "gray.50 0" }}
                   _focus={{ outline: "none" }}
                   h="100%"
                   px={0}
