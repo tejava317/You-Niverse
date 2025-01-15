@@ -11,7 +11,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import ErrorBoundary from './components/ErrorBoundary';
 
 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-console.log("Client ID is:", clientId); // Check if this prints in console
+//console.log("Client ID is:", clientId); // Check if this prints in console
 
 if (!clientId) {
   console.error("No client ID found!");
@@ -63,6 +63,6 @@ function App() {
     </ErrorBoundary>
   );
 }
-console.log("Google Client ID:", clientId);
+//console.log("Google Client ID:", clientId);
 
 export default App;

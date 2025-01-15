@@ -53,25 +53,25 @@ const ChangePlanet: React.FC<ChangePlanetProps> = ({ onPlanetChange, user_id }) 
     const fetchProjects = async () => {
       try {
         setLoading(true);
-        console.log("Current userId:", user_id);
+        //console.log("Current userId:", user_id);
         
         // localStorage에서 userId 가져오기 시도
         const storedUserId = localStorage.getItem('user_id');
-        console.log("Stored userId:", storedUserId);
+        //console.log("Stored userId:", storedUserId);
         
         const currentUserId = user_id || storedUserId;
         
         if (!currentUserId) {
-          console.log("No userId found");
+          //console.log("No userId found");
           setFilteredPlanets([]);
           setLoading(false);
           return;
         }
 
         // indexedDB에서 프로젝트 데이터 가져오기
-        console.log("Fetching projects for userId:", currentUserId);
+        //console.log("Fetching projects for userId:", currentUserId);
         const projectsData = await getProjectsByUserId(currentUserId);
-        console.log("Fetched projects:", projectsData);
+        //console.log("Fetched projects:", projectsData);
         
         // 생성 시간순으로 정렬
         const sortedProjects = projectsData.sort((a: { createdAt: string | number | Date; }, b: { createdAt: string | number | Date; }) => 
