@@ -12,7 +12,15 @@ from app.schemas.project import (
     UpdateScrumResponse
 )
 from app.utils.crypt import generate_project_id
-from app.utils.project import get_sequential_planet_index, compute_project_d_day
+from app.utils.github import (
+    validate_github_username,
+    validate_github_repo
+)
+from app.utils.project import (
+    get_sequential_planet_index,
+    compute_project_d_day,
+    compute_progress
+)
 
 router = APIRouter()
 
@@ -27,6 +35,11 @@ async def create_project(user_id: str, request: CreateProjectRequest, db=Depends
         })
         if existing_project:
             raise HTTPException(status_code=400, detail=f"Project '{request.project_name}' already exists")
+        
+        if not await validate_github_username(request.owner_username):
+            raise HTTPException(status_code=400, detail="Invalid GitHub username")
+        if not await validate_github_repo(request.owner_username, request.github_repo):
+            raise HTTPException(status_code=400, detail="Invalid GitHub repository")
 
         project_id = generate_project_id()
         planet_index = get_sequential_planet_index(collection, user_id)
@@ -37,8 +50,8 @@ async def create_project(user_id: str, request: CreateProjectRequest, db=Depends
             "project_name": request.project_name,
             "project_start": request.project_start,
             "project_end": request.project_end,
-            "owner_username": None,
-            "github_repo": None,
+            "owner_username": request.owner_username,
+            "github_repo": request.github_repo,
             "planet_index": planet_index
         })
         if result.inserted_id:
@@ -90,6 +103,7 @@ async def load_project_info(user_id: str, project_id: str, db=Depends(get_db)):
             raise HTTPException(status_code=404, detail="Project not found")
         
         d_day = compute_project_d_day(project["project_end"])
+        progress = compute_progress(project["project_start"], project["project_end"])
 
         scrum_collection = db["scrum"]
         today_date = datetime.now().strftime("%Y-%m-%d")
@@ -109,6 +123,7 @@ async def load_project_info(user_id: str, project_id: str, db=Depends(get_db)):
             "message": "Project information successfully retrieved",
             "project_name": project["project_name"],
             "d_day": d_day,
+            "progress": progress,
             "done": today_scrum.get("done"),
             "todo": today_scrum.get("todo"),
             "idea": today_scrum.get("idea")

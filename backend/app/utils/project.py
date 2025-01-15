@@ -39,3 +39,25 @@ def compute_project_d_day(project_end: str) -> str:
         return f"D-{days_diff}"
     else:
         return f"D+{abs(days_diff)}"
+
+def compute_progress(project_start: str, project_end: str):
+    try:
+        project_start_date = datetime.strptime(project_start, "%Y-%m-%d").date()
+        project_end_date = datetime.strptime(project_end, "%Y-%m-%d").date()
+    except ValueError:
+        raise ValueError(f"Invalid date format for project_end: {project_end} (Expected YYYY-MM-DD)")
+
+    today = datetime.today().date()
+
+    if today < project_start_date:
+        return 0
+    elif today > project_end_date:
+        return 100
+    else:
+        total_days = (project_end_date - project_start_date).days
+        elapsed_days = (today - project_start_date).days
+        progress = elapsed_days / total_days * 100
+        return progress
+
+if __name__ == "__main__":
+    print(compute_progress("2022-12-01", "2022-12-25"))
