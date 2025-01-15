@@ -5,11 +5,11 @@ let mainWindow;
 
 app.on('ready', () => {
   mainWindow = new BrowserWindow({
-    width: 1024,
-    height: 768,
+    width: 1440, // 너비 설정 (픽셀 단위)
+    height: 900, // 높이 설정 (픽셀 단위)
     webPreferences: {
       contextIsolation: true,
-      preload: path.join(__dirname, 'preload.js'), // 프리로드 파일 필요 시 사용
+      preload: path.join(__dirname, 'preload.js'), // 프리로드 파일 필요 시
     },
   });
 
@@ -18,7 +18,7 @@ app.on('ready', () => {
   if (isDev) {
     mainWindow.loadURL('http://localhost:5176'); // Vite 개발 서버
   } else {
-    mainWindow.loadFile(path.join(__dirname, '../dist/index.html')); // Vite 빌드 결과물
+    mainWindow.loadFile(path.join(__dirname, '../dist/index.html')); // Vite 빌드 파일
   }
 
   mainWindow.on('closed', () => {
