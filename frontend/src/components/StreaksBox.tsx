@@ -111,11 +111,11 @@ const StreaksBox: React.FC<StreaksBoxProps> = ({ project_id }) => {
           <Image
             src={streakData ? getStreakImage(streakData.streak) : "/images/우주선_step0.png"}
             alt="Streaks Image"
-            maxW="100%"
-            maxH="100%"
+            maxW="80%"
+            maxH="80%"
             objectFit="contain"
           />
-          <Text fontSize="2xl" fontWeight="bold" color="white" ml="15px">
+          <Text fontSize="2xl" fontWeight="bold" color="white" ml="40px">
             {streakData ? `${streakData.streak} Day Streak` : "Fetching streak..."} !!
           </Text>
         </Box>
@@ -141,7 +141,11 @@ const StreaksBox: React.FC<StreaksBoxProps> = ({ project_id }) => {
             alignItems="center"
             justifyContent="center"
           >
-            <Text fontSize="2xl" color="white" fontWeight="bold">
+            <Text
+              fontSize="2xl"
+              color={commitsToday === 0 ? "red.500" : "white"}
+              fontWeight="bold"
+            >
               {commitsToday !== null ? commitsToday : "Loading commits..."}
             </Text>
           </Box>

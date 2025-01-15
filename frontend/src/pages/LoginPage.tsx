@@ -258,7 +258,7 @@ const handleGithubSave = async (githubUsername: string) => {
           </InputLeftElement>
           <Input
             name="username"
-            placeholder="USER"
+            placeholder="ID"
             bg="gray.700"
             color="white"
             value={formData.username}

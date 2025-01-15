@@ -265,7 +265,7 @@ const AddPlanet: React.FC = () => {
         </Box>
         <Text
           position="absolute"
-          top="77%"
+          top="80%"
           left="25%"
           transform="translate(-50%, -50%)"
           color="white"
@@ -280,7 +280,7 @@ const AddPlanet: React.FC = () => {
         {projectName && (
           <Text
             position="absolute"
-            top="80%"
+            top="84%"
             left="25%"
             transform="translate(-50%, -50%)"
             color="gray.400"
@@ -296,7 +296,7 @@ const AddPlanet: React.FC = () => {
         {/* Black Box under planet name */}
         <Box
           position="absolute"
-          top="79.5%"
+          top="82%"
           left="25%"
           transform="translate(-50%, -50%)"
           w="150px"
@@ -403,7 +403,7 @@ const AddPlanet: React.FC = () => {
               <Box
                 position="relative"
                 borderBottom="1px solid white"
-                h="40px"
+                h="23px"
                 display="flex"
                 alignItems="center"
                 w="80px"
@@ -437,7 +437,7 @@ const AddPlanet: React.FC = () => {
               <Box
                 position="relative"
                 borderBottom="1px solid white"
-                h="40px"
+                h="23px"
                 display="flex"
                 alignItems="center"
                 flex="1"
