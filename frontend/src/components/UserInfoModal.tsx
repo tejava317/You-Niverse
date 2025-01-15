@@ -1,3 +1,4 @@
+//UserInfoModal.tsx
 import React, { useEffect, useState } from "react";
 import {
   Modal,
@@ -9,6 +10,7 @@ import {
   Box,
   Text,
   Tooltip,
+  Link,
 } from "@chakra-ui/react";
 import { InfoOutlineIcon } from "@chakra-ui/icons";
 import { useNavigate } from "react-router-dom";
@@ -96,8 +98,17 @@ const UserInfoModal: React.FC<UserInfoModalProps> = ({ isOpen, onClose }) => {
               <Text as="span" color="gray.400">
                 Github ID:
               </Text>{" "}
-              {githubUsername ? `@${githubUsername}` : "Not set"}
-              
+             {githubUsername ? (
+                <Link
+                  href={`https://github.com/${githubUsername}`}
+                  color="blue.400"
+                  isExternal
+                >
+                  @{githubUsername}
+                </Link>
+              ) : (
+                "Not set"
+              )}
             </Text>
             <Text fontSize="m" fontWeight="medium" mb={4}>
               <Text as="span" color="gray.400">

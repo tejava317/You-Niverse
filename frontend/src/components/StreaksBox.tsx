@@ -116,7 +116,7 @@ const StreaksBox: React.FC<StreaksBoxProps> = ({ project_id }) => {
             objectFit="contain"
           />
           <Text fontSize="2xl" fontWeight="bold" color="white" ml="15px">
-            {streakData ? `${streakData.streak} Day Streak` : "Fetching streak..."}
+            {streakData ? `${streakData.streak} Day Streak` : "Fetching streak..."} !!
           </Text>
         </Box>
       </Box>

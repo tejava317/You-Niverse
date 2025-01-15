@@ -12,18 +12,37 @@ import ScrumSection from "../components/ScrumSection";
 
 
 const PlanetProject: React.FC = () => {
-  
   const navigate = useNavigate();
   const location = useLocation();
-  const project_id = location.state?.project_id || localStorage.getItem('current_project_id');
+  const { project_id, planetName: statePlanetName, projectName: stateProjectName  } = location.state || {};
+  const [planetName, setPlanetName] = useState<string>("Unknown Destination");
+  const [projectName, setProjectName] = useState<string>("Unknown Project");
 
   useEffect(() => {
     if (!project_id) {
       console.error("No project ID found");
-      navigate("/MainPage"); // Redirect if no project ID
+      navigate("/MainPage");
       return;
     }
-  }, [project_id, navigate]);
+
+    // location.state에서 planetName이 없으면 localStorage에서 가져옵니다
+    const storedPlanetName = localStorage.getItem("currentPlanetName");
+    const storedProjectName = localStorage.getItem("currentProjectName");
+    
+    setPlanetName(statePlanetName || storedPlanetName || "Unknown Destination");
+    setProjectName(stateProjectName || storedProjectName || "Unknown Project");
+    
+
+    // 디버깅을 위한 로그
+    console.log({
+      statePlanetName,
+      storedPlanetName,
+      stateProjectName,
+      storedProjectName
+    });
+
+  }, [project_id, statePlanetName,stateProjectName, navigate]);
+
 
 
   return (
@@ -51,7 +70,7 @@ const PlanetProject: React.FC = () => {
       />
       <Box w="90%" maxW="1400px" h="85vh" display="flex" flexDirection="column" gap={6}>
         <Header />
-        <FlightForm />
+        <FlightForm planetName={planetName} projectName={projectName} />
         <ProgressBar project_id={project_id} />
         <Flex w="100%" gap={4}>
           <StreaksBox 

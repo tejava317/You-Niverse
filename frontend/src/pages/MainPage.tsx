@@ -6,6 +6,8 @@ import { IconButton } from "@chakra-ui/react";
 import { FaUser } from "react-icons/fa";
 import { useState, useEffect } from "react";
 import UserInfoModal from "../components/UserInfoModal";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -64,10 +66,10 @@ const Home: React.FC = () => {
           w="80%"
         >
           <Text fontSize="5xl" fontWeight="bold" color="white" letterSpacing="-1px">
-            To Space and Back
+          Explore You:Niverse
           </Text>
           <Text fontSize="lg" color="gray.400">
-            Explore the mysteries of the universe.
+          Start your journey and reach for the planets
           </Text>
         </Box>
 
@@ -110,7 +112,21 @@ const Home: React.FC = () => {
           }}
           onClick={() => navigate("/AddPlanetPage")}
         >
-          <Text fontSize="sm">Add a Planet</Text>
+          <Text fontSize="sm">
+            Add a Planet
+            </Text>
+            <Box
+            as="span"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            w="20px"
+            h="20px"
+            ml="17px"
+          >
+        {/* 아이콘 컴포넌트 추가 */}
+        <FontAwesomeIcon icon={faArrowRight} />
+      </Box>
         </Box>
       </Box>
 

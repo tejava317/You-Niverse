@@ -103,16 +103,30 @@ const ChangePlanet: React.FC<ChangePlanetProps> = ({ onPlanetChange, user_id }) 
   useEffect(() => {
     // 초기 행성 선택
     if (filteredPlanets.length > 0) {
-      onPlanetChange(filteredPlanets[currentIndex]);
+      const selectedPlanet = filteredPlanets[currentIndex];
+      onPlanetChange(selectedPlanet);
+      localStorage.setItem("currentPlanetName", selectedPlanet.name);
     }
   }, [filteredPlanets, currentIndex, onPlanetChange]);
 
 
   const handlePlanetClick = () => {
     const centralProject = projects[currentIndex];
-    if (centralProject) {
-      localStorage.setItem('current_project_id', centralProject.project_id);
-      navigate("/PlanetProjectPage", { state: { project_id: centralProject.project_id } });
+    const currentPlanet = filteredPlanets[currentIndex];
+    if (centralProject && currentPlanet) {
+      // 로컬 저장소에 currentPlanet.name 저장
+      localStorage.setItem("currentPlanetName", currentPlanet.name);
+      localStorage.setItem("currentProjectName", centralProject.projectName);
+
+
+      // PlanetProjectPage로 currentPlanet.name 전달
+      navigate("/PlanetProjectPage", {
+        state: {
+          project_id: centralProject.project_id,
+          planetName: currentPlanet.name,
+          projectName: centralProject.projectName
+        },
+      });
     }
   };
 
