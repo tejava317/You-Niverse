@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+//PlanetProjectPage.tsx
+import React, { useEffect, useState } from "react";
 import { Box, Flex, IconButton } from "@chakra-ui/react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowBackIcon } from "@chakra-ui/icons";
@@ -8,59 +9,22 @@ import ProgressBar from "../components/ProgressBar";
 import StreaksBox from "../components/StreaksBox";
 import ScrumSection from "../components/ScrumSection";
 
-const calendarMockData = [
-  {
-  date: "January 13, 2025",
-  details: {
-    done: "I did my frontend",
-    todo: "Have to do my backend",
-    idea: "Happy",
-  },
-},
-{
-  date: "January 14, 2025",
-  details: {
-    done: "Worked on the backend",
-    todo: "Integrate frontend and backend",
-    idea: "Productive day!",
-  },
-},
-];
+
 
 const PlanetProject: React.FC = () => {
+  
   const navigate = useNavigate();
   const location = useLocation();
-  const project_id = location.state?.project_id;
-  const [, setSelectedDate] = useState<string | null>(null);
-  const [selectedDetails, setSelectedDetails] = useState<{
-    done: string;
-    todo: string;
-    idea: string;
-  } | null>(null);
+  const project_id = location.state?.project_id || localStorage.getItem('current_project_id');
 
-  const handleDateClick = (date: string) => {
-    setSelectedDate(date);
-
-    const foundData = calendarMockData.find((data) => data.date === date);
-    if (foundData) {
-      setSelectedDetails(foundData.details);
-    } else {
-      setSelectedDetails({
-        done: "No data available",
-        todo: "No data available",
-        idea: "No data available",
-      });
+  useEffect(() => {
+    if (!project_id) {
+      console.error("No project ID found");
+      navigate("/MainPage"); // Redirect if no project ID
+      return;
     }
-  };
+  }, [project_id, navigate]);
 
-  const updateField = (field: string, value: string) => {
-    if (selectedDetails) {
-      setSelectedDetails({
-        ...selectedDetails,
-        [field]: value,
-      });
-    }
-  };
 
   return (
     <Box
@@ -95,9 +59,6 @@ const PlanetProject: React.FC = () => {
           />
           <ScrumSection
             project_id={project_id} // ScrumSection에 projectId 전달
-            selectedDetails={selectedDetails}
-            onDateClick={handleDateClick}
-            updateField={updateField}
           />
         </Flex>
       </Box>

@@ -7,9 +7,9 @@ interface DynamicPlanetDataProps {
 
 const DynamicPlanetData: React.FC<DynamicPlanetDataProps> = ({ onDataChange }) => {
   useEffect(() => {
-    const userId = localStorage.getItem("user_id");
-    if (userId) {
-      getProjectsByUserId(userId).then((projects) => {
+    const user_id = localStorage.getItem("user_id");
+    if (user_id) {
+      getProjectsByUserId(user_id).then((projects) => {
         const projectCount = projects.length;
 
         const planetData = [

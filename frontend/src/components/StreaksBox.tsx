@@ -1,3 +1,4 @@
+//StreaksBox.tsx
 import React, { useEffect, useState } from "react";
 import { Box, Text, Image, Flex } from "@chakra-ui/react";
 

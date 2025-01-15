@@ -20,7 +20,7 @@ const AddPlanet: React.FC = () => {
   const navigate = useNavigate();
   const toast = useToast();
 
-  const userId = localStorage.getItem("user_id"); // Get user_id from localStorage
+  const user_id = localStorage.getItem("user_id"); // Get user_id from localStorage
   const [currentPlanet] = useState({
     name: "Mercury",
     video: "/images/mercury.mp4",
@@ -34,7 +34,7 @@ const AddPlanet: React.FC = () => {
 
   // Function to handle saving the project
   const handleSaveProject = async () => {
-    if (!userId) {
+    if (!user_id) {
       toast({
         title: "User ID Missing",
         description: "Unable to save project without a valid user ID.",
@@ -77,7 +77,7 @@ const AddPlanet: React.FC = () => {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/api/project/create-project/${userId}`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/project/create-project/${user_id}`,
         {
           method: "POST",
           headers: {
@@ -95,10 +95,12 @@ const AddPlanet: React.FC = () => {
 
         // IndexedDB project schema
         const indexedDBProject = {
-          userId,
+          user_id,
           projectName,
-          projectId: project_id,
+          project_id: project_id,
           createdAt: new Date().toISOString(),
+          project_start:formatDate(startDate),
+          project_end:formatDate(endDate),
         };
 
          // Save to IndexedDB

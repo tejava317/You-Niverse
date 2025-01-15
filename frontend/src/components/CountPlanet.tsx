@@ -22,11 +22,11 @@ const ProjectCounter: React.FC = () => {
     setProjectCount(userProjects.length); // Update the project count
 
     // Save project count with user_id in localStorage
-    const userId = localStorage.getItem("user_id");
-    if (userId) {
+    const user_id = localStorage.getItem("user_id");
+    if (user_id) {
       localStorage.setItem(
         "project_count",
-        JSON.stringify({ user_id: userId, project_count: userProjects.length })
+        JSON.stringify({ user_id: user_id, project_count: userProjects.length })
       );
     }
   }, []);

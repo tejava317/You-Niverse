@@ -30,15 +30,15 @@ const UserInfoModal: React.FC<UserInfoModalProps> = ({ isOpen, onClose }) => {
     if (isOpen) {
       const savedNickname = localStorage.getItem("nickname");
       const savedGithubUsername = localStorage.getItem("github_username");
-      const userId = localStorage.getItem("user_id");
+      const user_id = localStorage.getItem("user_id");
 
 
       setNickname(savedNickname);
       setGithubUsername(savedGithubUsername);
 
-        if (userId) {
+        if (user_id) {
         // IndexedDB에서 해당 userId의 프로젝트를 가져옴
-        getProjectsByUserId(userId).then((projects) => {
+        getProjectsByUserId(user_id).then((projects) => {
           const projectCount = projects.length;
           setProjectCount(projectCount);
 

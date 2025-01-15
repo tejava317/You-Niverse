@@ -11,7 +11,7 @@ const Home: React.FC = () => {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [, setSelectedPlanet] = useState<{ name: string; video: string } | null>(null);
-  const [userId, setUserId] = useState<string>('');
+  const [user_id, setUserId] = useState<string>('');
 
   useEffect(() => {
     // localStorage에서 userId 가져오기
@@ -51,7 +51,7 @@ const Home: React.FC = () => {
       >
         <ChangePlanet 
           onPlanetChange={handlePlanetChange}
-          userId={userId}
+          user_id={user_id}
         />
 
         <Box

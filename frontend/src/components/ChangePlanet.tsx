@@ -1,3 +1,4 @@
+//ChangePlanet.tsx
 import React, { useState, useEffect } from "react";
 import { IconButton, Box, Image, Text } from "@chakra-ui/react";
 import { ArrowBackIcon, ArrowForwardIcon } from "@chakra-ui/icons";
@@ -106,6 +107,7 @@ const ChangePlanet: React.FC<ChangePlanetProps> = ({ onPlanetChange, user_id }) 
   const handlePlanetClick = () => {
     const centralProject = projects[currentIndex];
     if (centralProject) {
+      localStorage.setItem('current_project_id', centralProject.project_id);
       navigate("/PlanetProjectPage", { state: { project_id: centralProject.project_id } });
     }
   };

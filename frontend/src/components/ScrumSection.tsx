@@ -1,39 +1,72 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Text } from "@chakra-ui/react";
 import CustomCalendar from "../components/Calender";
 import EditableTextBox from "../components/EditableTextBox";
 
 interface ScrumSectionProps {
-  project_id: string | undefined;
-  selectedDetails: { done: string; todo: string; idea: string } | null;
-  onDateClick: (date: string) => void;
-  updateField: (field: string, value: string) => void;
+  project_id: string;
 }
 
-const ScrumSection: React.FC<ScrumSectionProps> = ({
-  project_id,
-  selectedDetails,
-  onDateClick,
-  updateField,
-}) => {
-
-  // 로컬 저장소에서 user_id 가져오기
+const ScrumSection: React.FC<ScrumSectionProps> = ({ project_id }) => {
   const user_id = localStorage.getItem("user_id");
+  const [selectedDate, setSelectedDate] = useState<string>("");
+  const [scrumDetails, setScrumDetails] = useState({
+    done: "",
+    todo: "",
+    idea: "",
+  });
 
-  // 현재 선택된 날짜를 관리
-  const [selectedDate, setSelectedDate] = React.useState<string>("");
-
-  // 달력에서 날짜를 클릭했을 때 실행
-  const handleDateClick = (date: string) => {
-    setSelectedDate(date);
-    onDateClick(date); // 부모 컴포넌트로 전달
+  const formatDateToYYYYMMDD = (date: string): string => {
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
   };
 
-  const handleFieldUpdate = async (field: string, value: string) => {
-    if (!user_id || !project_id || !selectedDate) {
-      console.error("User ID, Project ID, or Selected Date is missing");
+  // 날짜 클릭 시 실행
+  const handleDateClick = (date: string) => {
+    console.log("Selected date:", date);
+    setSelectedDate(date);
+  };
+
+  // DB에서 스크럼 데이터 불러오기
+  const loadScrumDetails = async (date: string) => {
+    if (!user_id || !project_id) {
+      console.error("Missing user_id or project_id");
       return;
     }
+
+    const formattedDate = formatDateToYYYYMMDD(date);
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/project/load-scrum/${user_id}/${project_id}/${formattedDate}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to load scrum details: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log("Loaded scrum details:", data);
+      setScrumDetails({
+        done: data.done || "",
+        todo: data.todo || "",
+        idea: data.idea || "",
+      });
+    } catch (error) {
+      console.error("Error loading scrum details:", error);
+    }
+  };
+
+  // 필드 업데이트
+  const handleFieldUpdate = async (field: string, value: string) => {
+    if (!user_id || !project_id || !selectedDate) {
+      console.error("Missing user_id, project_id, or selectedDate");
+      return;
+    }
+
+    const formattedDate = formatDateToYYYYMMDD(selectedDate);
 
     try {
       const response = await fetch(
@@ -44,8 +77,8 @@ const ScrumSection: React.FC<ScrumSectionProps> = ({
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            scrum_date: selectedDate,
-            scrum_update: new Date().toISOString(), // 현재 시간을 ISO 포맷으로 전송
+            scrum_date: formattedDate,
+            scrum_update: value,
           }),
         }
       );
@@ -54,12 +87,18 @@ const ScrumSection: React.FC<ScrumSectionProps> = ({
         throw new Error(`Failed to update field: ${response.statusText}`);
       }
 
-      console.log(`Successfully updated ${field}`);
-      updateField(field, value); // 상태 업데이트
+      console.log(`Successfully updated ${field} with value:`, value);
+      setScrumDetails((prev) => ({ ...prev, [field]: value }));
     } catch (error) {
       console.error("Error updating field:", error);
     }
   };
+
+  useEffect(() => {
+    if (selectedDate) {
+      loadScrumDetails(selectedDate);
+    }
+  }, [selectedDate]);
 
   return (
     <Box flex="2" h="350px">
@@ -69,33 +108,24 @@ const ScrumSection: React.FC<ScrumSectionProps> = ({
       <Box display="flex" h="100%" border="1px solid white">
         <CustomCalendar onDateClick={handleDateClick} />
         <Box w="50%" h="100%" position="relative">
-          {selectedDetails && (
+          {scrumDetails && (
             <>
               <EditableTextBox
                 label="Done"
-                value={selectedDetails.done}
-                onChange={(value) => {
-                    handleFieldUpdate("done", value);
-                    updateField("done", value); // 프론트에서 즉시 반영
-                  }}
+                value={scrumDetails.done}
+                onChange={(value) => handleFieldUpdate("done", value)}
                 top="0"
               />
               <EditableTextBox
                 label="ToDo"
-                value={selectedDetails.todo}
-                onChange={(value) => {
-                    handleFieldUpdate("todo", value);
-                    updateField("todo", value); // 프론트에서 즉시 반영
-                  }}
+                value={scrumDetails.todo}
+                onChange={(value) => handleFieldUpdate("todo", value)}
                 top="33.33%"
               />
               <EditableTextBox
                 label="Idea"
-                value={selectedDetails.idea}
-                onChange={(value) => {
-                    handleFieldUpdate("idea", value);
-                    updateField("idea", value); // 프론트에서 즉시 반영
-                  }}
+                value={scrumDetails.idea}
+                onChange={(value) => handleFieldUpdate("idea", value)}
                 top="66.66%"
               />
             </>

@@ -16,10 +16,12 @@ export const initializeDatabase = (): Promise<IDBDatabase> => {
   };
   
   export const saveProject = async (project: {
-    userId: string;
+    user_id: string;
     projectName: string;
-    projectId: string;
+    project_id: string;
     createdAt: string;
+    project_start:string;
+    project_end:string;
   }): Promise<void> => {
     const db = await initializeDatabase();
     const transaction = db.transaction("projects", "readwrite");
@@ -28,7 +30,7 @@ export const initializeDatabase = (): Promise<IDBDatabase> => {
     store.add(project);
   };
   
-  export const getProjectsByUserId = async (userId: string): Promise<any[]> => {
+  export const getProjectsByUserId = async (user_id: string): Promise<any[]> => {
     const db = await initializeDatabase();
     const transaction = db.transaction("projects", "readonly");
     const store = transaction.objectStore("projects");
@@ -40,7 +42,7 @@ export const initializeDatabase = (): Promise<IDBDatabase> => {
       request.onsuccess = (event) => {
         const cursor = request.result;
         if (cursor) {
-          if (cursor.value.userId === userId) {
+          if (cursor.value.user_id === user_id) {
             projects.push(cursor.value);
           }
           cursor.continue();
