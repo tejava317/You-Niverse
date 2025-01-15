@@ -43,9 +43,9 @@ const AddPlanet: React.FC = () => {
 
 
   useEffect(() => {
-    const totalPlanets = Number(localStorage.getItem("totalPlanets")) || 1;
-    const planetIndex = Math.max(0, totalPlanets); // totalPlanets - 1, 최소값 0 보장
-    setCurrentPlanet(planetData[planetIndex % planetData.length]);
+    const totalPlanets = Number(localStorage.getItem("totalPlanets")) || 0; // 기본값을 0으로 설정
+    const planetIndex = totalPlanets; // totalPlanets를 그대로 사용
+    setCurrentPlanet(planetData[planetIndex % planetData.length]); // 올바른 행성을 설정
   }, []);
 
   // Function to handle saving the project
@@ -392,7 +392,7 @@ const AddPlanet: React.FC = () => {
             <Flex alignItems="center">
               <Text
                 color="gray.400"
-                fontSize="sm"
+                fontSize="xs"
                 h="40px"
                 display="flex"
                 alignItems="center"
@@ -414,6 +414,7 @@ const AddPlanet: React.FC = () => {
                   id="github-prefix"
                   bg="transparent"
                   color="gray.500"
+                  fontSize="xs"
                   border="none"
                   _focus={{ outline: "none" }}
                   h="100%"
@@ -424,7 +425,7 @@ const AddPlanet: React.FC = () => {
 
               <Text
                 color="gray.400"
-                fontSize="sm"
+                fontSize="xs"
                 px={2}
                 h="40px"
                 display="flex"
@@ -443,9 +444,11 @@ const AddPlanet: React.FC = () => {
               >
                 <Input
                   id="github-repo"
-                  placeholder="repo name"
+                  placeholder="repository name"
                   bg="transparent"
                   color="white"
+                  fontSize="xs"
+
                   border="none"
                   value={githubRepo}
                   onChange={(e) => setGithubRepo(e.target.value)}
@@ -469,7 +472,7 @@ const AddPlanet: React.FC = () => {
             h="40px"
             onClick={handleSaveProject}
           >
-            Add Project
+            Add a Planet
           </Button>
         </Box>
       </Box>

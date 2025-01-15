@@ -31,8 +31,8 @@ const StreaksBox: React.FC<StreaksBoxProps> = ({ project_id }) => {
     const fetchData = async () => {
       try {
         const user_id = localStorage.getItem("user_id");
-        console.log("User ID:", user_id);
-        console.log("Project ID:", project_id);
+        //console.log("User ID:", user_id);
+        //console.log("Project ID:", project_id);
 
         if (!user_id || !project_id) {
           throw new Error("User ID or Project ID is missing.");
@@ -40,16 +40,16 @@ const StreaksBox: React.FC<StreaksBoxProps> = ({ project_id }) => {
 
         // Fetch streak data
         const streakUrl = `${import.meta.env.VITE_BACKEND_URL}/api/github/load-streak/${user_id}/${project_id}`;
-        console.log("Streak API URL:", streakUrl);
+        //console.log("Streak API URL:", streakUrl);
         const streakResponse = await fetch(streakUrl);
-        console.log("Streak API Response Status:", streakResponse.status);
+        //console.log("Streak API Response Status:", streakResponse.status);
 
         if (!streakResponse.ok) {
           throw new Error(`Failed to fetch streak data: ${streakResponse.statusText}`);
         }
 
         const streakData = await streakResponse.json();
-        console.log("Fetched Streak Data:", streakData);
+        //console.log("Fetched Streak Data:", streakData);
         setStreakData({
           message: streakData.message,
           streak: streakData.streak,
@@ -57,30 +57,30 @@ const StreaksBox: React.FC<StreaksBoxProps> = ({ project_id }) => {
 
         // Fetch commits today data
         const commitsUrl = `${import.meta.env.VITE_BACKEND_URL}/api/github/load-commits-today/${user_id}/${project_id}`;
-        console.log("Commits Today API URL:", commitsUrl);
+        //console.log("Commits Today API URL:", commitsUrl);
         const commitsResponse = await fetch(commitsUrl);
-        console.log("Commits Today API Response Status:", commitsResponse.status);
+        //console.log("Commits Today API Response Status:", commitsResponse.status);
 
         if (!commitsResponse.ok) {
           throw new Error(`Failed to fetch commits today: ${commitsResponse.statusText}`);
         }
 
         const commitsData = await commitsResponse.json();
-        console.log("Fetched Commits Today Data:", commitsData);
+        //console.log("Fetched Commits Today Data:", commitsData);
         setCommitsToday(commitsData.commits_today);
 
         // Fetch D-Day data from /api/project/load-project-info
         const projectInfoUrl = `${import.meta.env.VITE_BACKEND_URL}/api/project/load-project-info/${user_id}/${project_id}`;
-        console.log("Project Info API URL:", projectInfoUrl);
+        //console.log("Project Info API URL:", projectInfoUrl);
         const projectInfoResponse = await fetch(projectInfoUrl);
-        console.log("Project Info API Response Status:", projectInfoResponse.status);
+        //console.log("Project Info API Response Status:", projectInfoResponse.status);
 
         if (!projectInfoResponse.ok) {
           throw new Error(`Failed to fetch project info: ${projectInfoResponse.statusText}`);
         }
 
         const projectInfoData = await projectInfoResponse.json();
-        console.log("Fetched Project Info Data:", projectInfoData);
+        //console.log("Fetched Project Info Data:", projectInfoData);
         setDday(projectInfoData.d_day || "N/A");
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -116,7 +116,7 @@ const StreaksBox: React.FC<StreaksBoxProps> = ({ project_id }) => {
             objectFit="contain"
           />
           <Text fontSize="2xl" fontWeight="bold" color="white" ml="15px">
-            {streakData ? `${streakData.streak} Day Streak` : "Fetching streak..."}
+            {streakData ? `${streakData.streak} Day Streak` : "Fetching streak..."} !!
           </Text>
         </Box>
       </Box>
