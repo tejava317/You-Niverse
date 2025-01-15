@@ -102,7 +102,7 @@ const toast = useToast();
   </InputLeftElement>
   <Input
     name="username"
-    placeholder="USER"
+    placeholder="ID"
     bg="gray.700"
     color="white"
     value={formData.username} // Bind the value to the state
@@ -117,7 +117,7 @@ const toast = useToast();
   />
 </InputGroup>
 
-<InputGroup mb={6}>
+<InputGroup mb={4}>
   <InputLeftElement pointerEvents="none" color="gray.400">
     <FaLock />
   </InputLeftElement>

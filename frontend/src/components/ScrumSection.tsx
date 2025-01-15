@@ -115,6 +115,7 @@ const ScrumSection: React.FC<ScrumSectionProps> = ({ project_id }) => {
                 value={scrumDetails.done}
                 onChange={(value) => handleFieldUpdate("done", value)}
                 top="0"
+                
               />
               <EditableTextBox
                 label="Todo"

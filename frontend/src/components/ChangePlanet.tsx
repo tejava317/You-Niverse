@@ -207,7 +207,7 @@ const ChangePlanet: React.FC<ChangePlanetProps> = ({ onPlanetChange, user_id }) 
         aria-label="Previous Planet"
         position="absolute"
         bottom="42%"
-        left="36.1%"
+        left="35.1%"
         w="40px"
         h="40px"
         borderRadius="50%"
@@ -226,7 +226,7 @@ const ChangePlanet: React.FC<ChangePlanetProps> = ({ onPlanetChange, user_id }) 
         aria-label="Next Planet"
         position="absolute"
         bottom="42%"
-        left="60.9%"
+        left="61.9%"
         w="40px"
         h="40px"
         borderRadius="50%"
@@ -276,7 +276,7 @@ const ChangePlanet: React.FC<ChangePlanetProps> = ({ onPlanetChange, user_id }) 
           >
             {planet.name}
           </Text>
-          <Text color="gray.300" fontSize="xs" textAlign="center">
+          <Text color="gray.300" fontSize="2xs" textAlign="center">
             {getProjectName(filteredPlanets.indexOf(planet))}
           </Text>
         </Box>
@@ -319,7 +319,7 @@ const ChangePlanet: React.FC<ChangePlanetProps> = ({ onPlanetChange, user_id }) 
           >
             {planet.name}
           </Text>
-          <Text color="gray.300" fontSize="xs" textAlign="center">
+          <Text color="gray.300" fontSize="2xs" textAlign="center">
             {getProjectName(filteredPlanets.indexOf(planet))}
           </Text>
         </Box>
@@ -328,7 +328,7 @@ const ChangePlanet: React.FC<ChangePlanetProps> = ({ onPlanetChange, user_id }) 
       {/* Central Planet Info */}
       <Box
         position="absolute"
-        top="76%"
+        top="78.5%"
         left="50%"
         transform="translate(-50%, -50%)"
         w="180px"
